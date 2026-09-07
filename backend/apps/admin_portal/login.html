@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revinteq Admin — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#1F7A4C;--green-d:#155c38;--green-l:#E8F5EE;
+  --slate:#1E293B;--slate-m:#475569;--slate-l:#94A3B8;
+  --bg:#F1F5F9;--card:#fff;--border:#E2E8F0;
+  --amber:#D97706;--red:#EF4444;--red-l:#FEF2F2;
+  --font:'Nunito',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;-webkit-font-smoothing:antialiased}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.container{width:100%;max-width:420px;animation:fadeUp .5s ease}
+
+.brand{text-align:center;margin-bottom:32px}
+.logo{font-size:32px;font-weight:900;letter-spacing:-.5px;line-height:1}
+.logo span{background:linear-gradient(135deg,#34d399,#1F7A4C);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.admin-chip{display:inline-flex;align-items:center;background:var(--amber);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;margin-left:8px;letter-spacing:.6px;text-transform:uppercase;position:relative;top:-4px}
+.brand-sub{font-size:13px;color:var(--slate-l);font-weight:600;margin-top:8px}
+
+.card{background:var(--card);border-radius:18px;border:1px solid var(--border);padding:36px;box-shadow:0 10px 40px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04)}
+
+.card-title{font-size:20px;font-weight:900;color:var(--slate);margin-bottom:6px;letter-spacing:-.3px}
+.card-sub{font-size:13px;color:var(--slate-l);font-weight:600;margin-bottom:28px}
+
+.form-group{margin-bottom:18px}
+label{display:block;font-size:11.5px;font-weight:800;color:var(--slate-m);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);color:var(--slate);font-weight:600;background:var(--card);transition:border-color .15s,box-shadow .15s;outline:none}
+input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,122,76,.1)}
+
+.btn{width:100%;padding:13px;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;border:none;font-family:var(--font);background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(31,122,76,.3);transition:all .15s;letter-spacing:-.1px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px}
+.btn:hover{background:var(--green-d);transform:translateY(-1px);box-shadow:0 6px 20px rgba(31,122,76,.4)}
+.btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
+
+.error{background:var(--red-l);border:1.5px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;font-weight:700;color:#991b1b;margin-bottom:16px;display:none}
+.error.show{display:block}
+
+.footer-note{text-align:center;margin-top:20px;font-size:12px;color:var(--slate-l);font-weight:600}
+.footer-note a{color:var(--green);text-decoration:none;font-weight:700}
+.footer-note a:hover{text-decoration:underline}
+
+.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.spinner.show{display:block}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--slate-l);font-size:12px;font-weight:700}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand">
+    <div class="logo"><span>Revinteq</span><span class="admin-chip">Admin</span></div>
+    <div class="brand-sub">Gimsc Solutions Ltd &mdash; Revenue Intelligence Platform</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Admin Sign In</div>
+    <div class="card-sub">Access the agency management portal</div>
+
+    <div class="error" id="error-msg"></div>
+
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="admin@gimsc.co.ke" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+    </div>
+
+    <button class="btn" id="login-btn" onclick="login()">
+      <span id="btn-text">Sign In to Admin Portal</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </div>
+
+  <div class="footer-note">
+    Are you a client? <a href="/client/login.html">Go to Client Portal →</a>
+  </div>
+</div>
+
+<script>
+const API = '/api/v1';
+
+async function login() {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const errEl    = document.getElementById('error-msg');
+  errEl.classList.remove('show');
+
+  if (!email || !password) {
+    errEl.textContent = 'Email and password are required.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const btn  = document.getElementById('login-btn');
+  btn.disabled = true;
+  document.getElementById('btn-text').textContent = 'Signing in...';
+  document.getElementById('spinner').classList.add('show');
+
+  try {
+    const res  = await fetch(`${API}/auth/login/`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email, password}),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.message || 'Login failed. Please check your credentials.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    // Verify admin role
+    const role = data.user?.role;
+    if (!['SUPER_ADMIN', 'ADMIN'].includes(role)) {
+      errEl.textContent = 'You do not have admin access. Please use the Client Portal.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    // Store tokens
+    localStorage.setItem('admin_token',   data.access);
+    localStorage.setItem('admin_refresh', data.refresh);
+    localStorage.setItem('admin_user',    JSON.stringify(data.user));
+    localStorage.setItem('admin_tenant',  JSON.stringify(data.tenant));
+
+    // Redirect to admin portal
+    window.location.href = '/admin-portal/index.html';
+
+  } catch (err) {
+    errEl.textContent = 'Network error. Please check your connection and try again.';
+    errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    document.getElementById('btn-text').textContent = 'Sign In to Admin Portal';
+    document.getElementById('spinner').classList.remove('show');
+  }
+}
+</script>
+</body>
+</html>

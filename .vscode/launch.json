@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Django Backend",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/manage.py",
+      "args": ["runserver", "0.0.0.0:8000"],
+      "django": true,
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings.local"
+      },
+      "cwd": "${workspaceFolder}/backend"
+    }
+  ]
+}

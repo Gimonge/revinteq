@@ -1,0 +1,41 @@
+{
+  "python.defaultInterpreterPath": "./backend/venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.extraPaths": ["./backend"],
+  "[python]": {
+    "editor.formatOnSave": false
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "terminal.integrated.env.osx": {
+    "DJANGO_SETTINGS_MODULE": "config.settings.local"
+  },
+  "terminal.integrated.env.linux": {
+    "DJANGO_SETTINGS_MODULE": "config.settings.local"
+  },
+  "terminal.integrated.env.windows": {
+    "DJANGO_SETTINGS_MODULE": "config.settings.local"
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/node_modules": true,
+    "**/.git": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/venv": true,
+    "backend/db.sqlite3": true
+  },
+  "emmet.includeLanguages": {
+    "vue": "html"
+  },
+  "tailwindCSS.includeLanguages": {
+    "vue": "html"
+  }
+}

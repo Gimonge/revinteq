@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.pylance",
+    "Vue.volar",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "batisteo.vscode-django",
+    "ms-python.black-formatter"
+  ]
+}

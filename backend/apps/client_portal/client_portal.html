@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revinteq — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900;1000&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#1F7A4C;--green-d:#155c38;--green-l:#E8F5EE;
+  --blue:#2563EB;--blue-l:#EFF6FF;
+  --amber:#D97706;--amber-l:#FFFBEB;
+  --red:#EF4444;--red-l:#FEF2F2;
+  --purple:#7C3AED;--purple-l:#F5F3FF;
+  --ig1:#F58529;--ig2:#DD2A7B;--ig3:#8134AF;
+  --slate:#1E293B;--slate-m:#475569;--slate-l:#94A3B8;
+  --bg:#F8FAFC;--card:#fff;--border:#E2E8F0;
+  --shadow:0 1px 4px rgba(0,0,0,.07);
+  --shadow-md:0 4px 16px rgba(0,0,0,.09);
+  --sw:240px;--font:'Nunito',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--slate);display:flex;min-height:100vh}
+
+/* Sidebar */
+.sb{width:var(--sw);background:var(--slate);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;overflow-y:auto;z-index:100}
+.sb-logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo-text{font-size:20px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.sb-logo-tenant{font-size:11px;color:rgba(255,255,255,.45);margin-top:3px;font-weight:600}
+.sb-sec{padding:14px 12px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px}
+.nav{display:flex;align-items:center;gap:9px;padding:9px 14px;margin:1px 8px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;font-weight:600;transition:all .15s}
+.nav:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav.on{background:var(--green);color:#fff}
+.nav .ic{font-size:15px;width:18px;text-align:center}
+.sb-foot{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.08)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px;flex-shrink:0}
+.sb-uname{font-size:12px;font-weight:700;color:#fff}
+.sb-biz{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+
+/* Main */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column}
+.bar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.bar-title{font-size:17px;font-weight:800}
+.bar-right{display:flex;align-items:center;gap:10px}
+.pg{padding:24px;display:none;flex-direction:column;gap:18px}
+.pg.on{display:flex}
+
+/* Cards */
+.card{background:var(--card);border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.ch{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:14px;font-weight:800}
+.cb{padding:18px}
+
+/* GPS */
+.gps{border-radius:12px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.gps.ahead{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff}
+.gps.on_track{background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff}
+.gps.behind{background:linear-gradient(135deg,var(--amber),#b45309);color:#fff}
+.gps.no_goal{background:var(--card);border:1px solid var(--border)}
+.gps-label{font-size:12px;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:.5px}
+.gps-status{font-size:28px;font-weight:900;line-height:1}
+.gps-sub{font-size:13px;opacity:.85;margin-top:4px}
+.gps-right{text-align:right}
+.gps-gap{font-size:22px;font-weight:900}
+.gps-gap-label{font-size:12px;opacity:.75}
+
+/* Stats */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.sc{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:18px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--green)}
+.sc.b::before{background:var(--blue)}
+.sc.a::before{background:var(--amber)}
+.sc.p::before{background:var(--purple)}
+.sc.ig::before{background:linear-gradient(90deg,var(--ig1),var(--ig2),var(--ig3))}
+.sl{font-size:10px;font-weight:700;color:var(--slate-l);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.sv{font-size:26px;font-weight:900;line-height:1}
+.ss{font-size:11px;color:var(--slate-m);margin-top:5px;font-weight:500}
+
+/* AOV strip */
+.aov-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--border);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.aov-cell{background:var(--card);padding:14px 16px}
+.aov-label{font-size:10px;font-weight:700;color:var(--slate-l);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.aov-value{font-size:18px;font-weight:900;color:var(--slate)}
+
+/* Btn */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:var(--font)}
+.btn-g{background:var(--green);color:#fff}.btn-g:hover{background:var(--green-d)}
+.btn-s{background:var(--bg);color:var(--slate);border:1px solid var(--border)}.btn-s:hover{background:var(--border)}
+.btn-r{background:var(--red-l);color:var(--red)}.btn-r:hover{background:var(--red);color:#fff}
+.btn-a{background:var(--amber-l);color:var(--amber)}.btn-a:hover{background:var(--amber);color:#fff}
+.btn-p{background:var(--purple-l);color:var(--purple)}
+.btn-ig{background:linear-gradient(135deg,var(--ig1),var(--ig2));color:#fff}
+.btn-sm{padding:5px 11px;font-size:11.5px}
+
+/* Table */
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--bg);padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--slate-m);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.tfoot td{background:var(--green-l);font-weight:800;border-top:2px solid var(--green)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:700}
+.bg{background:var(--green-l);color:var(--green)}
+.bb{background:var(--blue-l);color:var(--blue)}
+.ba{background:var(--amber-l);color:var(--amber)}
+.br{background:var(--red-l);color:var(--red)}
+.bp{background:var(--purple-l);color:var(--purple)}
+.big{background:linear-gradient(135deg,var(--ig1),var(--ig3));color:#fff}
+.bgy{background:var(--bg);color:var(--slate-m)}
+
+/* Pipeline */
+.board{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;overflow-x:auto}
+.col{background:var(--bg);border-radius:10px;padding:10px;min-width:160px}
+.col-head{font-size:11.5px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.col-count{background:rgba(0,0,0,.08);border-radius:20px;padding:2px 8px;font-size:10px}
+.deal-card{background:var(--card);border-radius:8px;border:1px solid var(--border);padding:12px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s}
+.deal-card:hover{box-shadow:var(--shadow-md)}
+.deal-name{font-size:12px;font-weight:800;margin-bottom:4px}
+.deal-meta{font-size:11px;color:var(--slate-m)}
+.deal-vel{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:6px}
+.vel-hot{background:#fef2f2;color:var(--red)}
+.vel-warm{background:var(--amber-l);color:var(--amber)}
+.vel-cold{background:var(--blue-l);color:var(--blue)}
+.deal-actions{display:flex;gap:5px;margin-top:8px}
+.stage-new_click{border-left:3px solid var(--blue)}
+.stage-contacted{border-left:3px solid var(--amber)}
+.stage-interested{border-left:3px solid var(--purple)}
+.stage-negotiating{border-left:3px solid #DB2777}
+.stage-won{border-left:3px solid var(--green)}
+.stage-lost{border-left:3px solid var(--red)}
+
+/* Form */
+.fg{margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:700;color:var(--slate-m);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+input,select,textarea{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);color:var(--slate);background:var(--card);transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green)}
+textarea{min-height:70px;resize:vertical}
+.ref-row{display:none}
+.ref-row.visible{display:block}
+
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.mo.open{display:flex}
+.md{background:var(--card);border-radius:14px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.mh{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:15px;font-weight:800}
+.mx{background:none;border:none;font-size:20px;cursor:pointer;color:var(--slate-l);line-height:1}
+.mb{padding:22px}
+.mf{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+
+/* Chart */
+.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.chart-label{font-size:11px;color:var(--slate-m);width:90px;text-align:right;font-weight:600;flex-shrink:0}
+.chart-bar{height:22px;border-radius:4px;background:var(--green);transition:width .6s ease;min-width:2px}
+.chart-val{font-size:11px;font-weight:700;color:var(--slate);flex-shrink:0}
+
+/* Upload */
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:border-color .15s}
+.upload-zone:hover{border-color:var(--green)}
+.upload-zone.drag{border-color:var(--green);background:var(--green-l)}
+.preview-row.valid{background:#f0fdf4}
+.preview-row.error{background:var(--red-l)}
+
+/* Alert */
+.alert{padding:11px 14px;border-radius:8px;font-size:12.5px;font-weight:600;display:flex;gap:8px}
+.al-g{background:var(--green-l);color:var(--green)}
+.al-r{background:var(--red-l);color:var(--red)}
+.al-a{background:var(--amber-l);color:var(--amber)}
+
+/* Spinner */
+.spin{width:18px;height:18px;border:2.5px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Empty */
+.emp{padding:40px;text-align:center;color:var(--slate-m)}
+.emp-ic{font-size:36px;margin-bottom:10px}
+.emp-t{font-size:14px;font-weight:700;color:var(--slate);margin-bottom:4px}
+
+/* Divider */
+.div{height:1px;background:var(--border);margin:14px 0}
+
+/* 2-col grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.g2{grid-template-columns:1fr}.board{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.main{margin-left:0}.sb{transform:translateX(-100%);transition:.3s}.sb.open{transform:none}.board{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sb" id="sb">
+  <div class="sb-logo">
+    <div class="sb-logo-text">Revinteq</div>
+    <div class="sb-logo-tenant" id="sb-biz">Loading...</div>
+  </div>
+  <div class="sb-sec">Main</div>
+  <div class="nav on" onclick="goto('dashboard')"><span class="ic">🏠</span> Dashboard</div>
+  <div class="nav" onclick="goto('analytics')"><span class="ic">📊</span> Analytics</div>
+  <div class="nav" onclick="goto('pipeline')"><span class="ic">🎯</span> Sales Pipeline</div>
+  <div class="sb-sec">Sales</div>
+  <div class="nav" onclick="goto('log-sale')"><span class="ic">✏️</span> Log a Sale</div>
+  <div class="nav" onclick="goto('sales-history')"><span class="ic">📋</span> Sales History</div>
+  <div class="nav" onclick="goto('bulk-upload')"><span class="ic">📤</span> Bulk Upload</div>
+  <div class="sb-sec">Ads</div>
+  <div class="nav" onclick="goto('facebook-ads')"><span class="ic">📘</span> Facebook Ads</div>
+  <div class="nav" onclick="goto('instagram-ads')"><span class="ic">📸</span> Instagram Ads</div>
+  <div class="sb-sec">Goals & SMS</div>
+  <div class="nav" onclick="goto('revenue-goals')"><span class="ic">🎯</span> Revenue Goals</div>
+  <div class="nav" onclick="goto('sms')"><span class="ic">📱</span> SMS</div>
+  <div class="sb-sec">Account</div>
+  <div class="nav" onclick="goto('settings')"><span class="ic">⚙️</span> Settings</div>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av" id="sb-av">U</div>
+      <div>
+        <div class="sb-uname" id="sb-uname">—</div>
+        <div class="sb-biz" id="sb-biz2">—</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+<div class="bar">
+  <div class="bar-title" id="bar-title">Dashboard</div>
+  <div class="bar-right">
+    <span id="currency-badge" class="badge bg">KES</span>
+    <button class="btn btn-sm btn-s" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="pg on" id="pg-dashboard">
+  <div id="gps-strip"><div class="gps no_goal"><div><div class="gps-label">Revenue GPS</div><div class="gps-status">Loading...</div></div></div></div>
+  <div class="sg" id="kpi-cards">
+    <div class="sc"><div class="sl">Total Revenue</div><div class="sv" id="kpi-revenue">—</div><div class="ss">This month</div></div>
+    <div class="sc b"><div class="sl">Ad Spend</div><div class="sv" id="kpi-spend">—</div><div class="ss">Facebook + Instagram</div></div>
+    <div class="sc a"><div class="sl">ROI</div><div class="sv" id="kpi-roi">—</div><div class="ss">Return on ad spend</div></div>
+    <div class="sc p"><div class="sl">Conversations</div><div class="sv" id="kpi-convs">—</div><div class="ss">WhatsApp clicks</div></div>
+  </div>
+  <div class="aov-strip" id="aov-strip">
+    <div class="aov-cell"><div class="aov-label">AOV (All)</div><div class="aov-value" id="aov-all">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Facebook AOV</div><div class="aov-value" id="aov-fb">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Instagram AOV</div><div class="aov-value" id="aov-ig">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Rev / Client</div><div class="aov-value" id="aov-rpc">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Cost / Conv.</div><div class="aov-value" id="aov-cpc">—</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><span class="ct">Revenue — Last 7 Days</span></div>
+      <div class="cb" id="chart-7day"><div class="spin"></div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Today's Guidance</span></div>
+      <div class="cb" id="guidance-card">
+        <p style="color:var(--slate-m);font-size:13px">Loading your daily guidance...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ANALYTICS ═══ -->
+<div class="pg" id="pg-analytics">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div><div style="font-size:19px;font-weight:900">Analytics</div><div style="font-size:12px;color:var(--slate-m);margin-top:2px">Performance breakdown by platform</div></div>
+    <div style="display:flex;gap:8px">
+      <select id="analytics-period" onchange="loadAnalytics()">
+        <option value="month">This Month</option>
+        <option value="week">This Week</option>
+      </select>
+    </div>
+  </div>
+  <div class="sg" id="analytics-cards">
+    <div class="sc"><div class="sl">Total Revenue</div><div class="sv" id="an-rev">—</div></div>
+    <div class="sc b"><div class="sl">Facebook Revenue</div><div class="sv" id="an-fb-rev">—</div></div>
+    <div class="sc ig"><div class="sl">Instagram Revenue</div><div class="sv" id="an-ig-rev">—</div></div>
+    <div class="sc a"><div class="sl">Overall ROI</div><div class="sv" id="an-roi">—</div></div>
+  </div>
+  <div class="aov-strip">
+    <div class="aov-cell"><div class="aov-label">AOV (All)</div><div class="aov-value" id="an-aov">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Facebook AOV</div><div class="aov-value" id="an-fb-aov">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Instagram AOV</div><div class="aov-value" id="an-ig-aov">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Conversion Rate</div><div class="aov-value" id="an-cr">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Cost / Sale</div><div class="aov-value" id="an-cps">—</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Ad Performance</span><button class="btn btn-sm btn-s" onclick="loadAdPerf()">↻ Refresh</button></div>
+    <div class="tw"><table>
+      <thead><tr><th>Ad</th><th>Platform</th><th>Spend</th><th>Revenue</th><th>ROI</th><th>AOV</th><th>Sales</th><th>Cost/Sale</th></tr></thead>
+      <tbody id="ad-perf-table"><tr><td colspan="8" style="text-align:center;padding:24px"><div class="spin"></div></td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ PIPELINE ═══ -->
+<div class="pg" id="pg-pipeline">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div><div style="font-size:19px;font-weight:900">Sales Pipeline</div><div style="font-size:12px;color:var(--slate-m);margin-top:2px">Track every customer journey</div></div>
+    <div style="display:flex;gap:8px">
+      <select id="pipeline-platform" onchange="loadPipeline()">
+        <option value="">All Platforms</option>
+        <option value="facebook">Facebook</option>
+        <option value="instagram">Instagram</option>
+        <option value="organic">Organic</option>
+      </select>
+      <button class="btn btn-g btn-sm" onclick="openAddDeal()">+ Add Deal</button>
+    </div>
+  </div>
+  <!-- Pipeline summary strip -->
+  <div class="aov-strip" id="pipeline-summary">
+    <div class="aov-cell"><div class="aov-label">Pipeline Value</div><div class="aov-value" id="ps-value">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Open Deals</div><div class="aov-value" id="ps-open">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Avg Velocity</div><div class="aov-value" id="ps-vel">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Win Rate</div><div class="aov-value" id="ps-wr">—</div></div>
+    <div class="aov-cell"><div class="aov-label">Won This Month</div><div class="aov-value" id="ps-won">—</div></div>
+  </div>
+  <div class="board" id="pipeline-board"><div style="grid-column:1/-1;text-align:center;padding:40px"><div class="spin"></div></div></div>
+</div>
+
+<!-- ═══ LOG SALE ═══ -->
+<div class="pg" id="pg-log-sale">
+  <div><div style="font-size:19px;font-weight:900">Log a Sale</div><div style="font-size:12px;color:var(--slate-m);margin-top:2px">Takes under 10 seconds</div></div>
+  <div class="card" style="max-width:560px">
+    <div class="ch"><span class="ct">New Sale</span></div>
+    <div class="cb">
+      <div id="log-sale-alert"></div>
+      <div class="fg"><label>Product / Service *</label><input id="sl-product" placeholder="e.g. Blue Summer Dress (Size M)"></div>
+      <div class="g2">
+        <div class="fg"><label>Amount (KES) *</label><input id="sl-amount" type="number" placeholder="0" min="1"></div>
+        <div class="fg"><label>Sale Date *</label><input id="sl-date" type="date"></div>
+      </div>
+      <div class="g2">
+        <div class="fg">
+          <label>Payment Method *</label>
+          <select id="sl-payment" onchange="updateRefField()">
+            <option value="cash">Cash</option>
+            <option value="mpesa_manual">M-Pesa</option>
+            <option value="bank_deposit">Bank Deposit</option>
+            <option value="eft">EFT</option>
+            <option value="rtgs">RTGS</option>
+            <option value="standing_order">Standing Order</option>
+            <option value="cheque">Cheque</option>
+            <option value="card">Card</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fg ref-row" id="ref-row">
+          <label id="ref-label">Reference</label>
+          <input id="sl-ref" placeholder="Enter reference">
+        </div>
+      </div>
+      <div class="g2">
+        <div class="fg">
+          <label>Platform Source</label>
+          <select id="sl-platform">
+            <option value="facebook">Facebook Ad</option>
+            <option value="instagram">Instagram Ad</option>
+            <option value="organic">Organic / Walk-in</option>
+            <option value="referral">Referral</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Map to Campaign (optional)</label>
+          <select id="sl-campaign"><option value="">— None —</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>Notes (optional)</label><textarea id="sl-notes" placeholder="Any extra details"></textarea></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn btn-g" onclick="logSale()">✅ Log Sale</button>
+        <button class="btn btn-s" onclick="clearSaleForm()">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SALES HISTORY ═══ -->
+<div class="pg" id="pg-sales-history">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div><div style="font-size:19px;font-weight:900">Sales History</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="date" id="sh-from" onchange="loadSales()">
+      <input type="date" id="sh-to" onchange="loadSales()">
+      <select id="sh-platform" onchange="loadSales()">
+        <option value="">All Platforms</option>
+        <option value="facebook">Facebook</option>
+        <option value="instagram">Instagram</option>
+        <option value="organic">Organic</option>
+        <option value="referral">Referral</option>
+      </select>
+      <select id="sh-payment" onchange="loadSales()">
+        <option value="">All Payments</option>
+        <option value="mpesa_manual">M-Pesa</option>
+        <option value="cash">Cash</option>
+        <option value="bank_deposit">Bank</option>
+        <option value="cheque">Cheque</option>
+      </select>
+      <input placeholder="Search..." id="sh-search" onchange="loadSales()" style="width:140px">
+    </div>
+  </div>
+  <div class="card">
+    <div class="tw"><table>
+      <thead><tr><th>Date</th><th>Product</th><th>Amount</th><th>Payment</th><th>Reference</th><th>Platform</th><th>Campaign</th><th>Action</th></tr></thead>
+      <tbody id="sales-tbody"><tr><td colspan="8" style="text-align:center;padding:24px"><div class="spin"></div></td></tr></tbody>
+      <tfoot><tr class="tfoot" id="sales-totals-row">
+        <td colspan="2"><strong>TOTALS</strong></td>
+        <td id="tot-revenue">—</td>
+        <td id="tot-mpesa">M-Pesa: —</td>
+        <td></td>
+        <td id="tot-fb">FB: —</td>
+        <td></td>
+        <td></td>
+      </tr></tfoot>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ BULK UPLOAD ═══ -->
+<div class="pg" id="pg-bulk-upload">
+  <div><div style="font-size:19px;font-weight:900">Bulk Upload</div><div style="font-size:12px;color:var(--slate-m);margin-top:2px">Upload multiple sales at once using Excel</div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><span class="ct">Step 1 — Download Template</span></div>
+      <div class="cb">
+        <p style="font-size:13px;color:var(--slate-m);margin-bottom:14px">Download the Excel template, fill in your sales data, then upload it back here.</p>
+        <button class="btn btn-g" onclick="downloadTemplate()">📥 Download Excel Template</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Step 2 — Upload Your File</span></div>
+      <div class="cb">
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+          <div style="font-size:32px;margin-bottom:8px">📤</div>
+          <div style="font-size:14px;font-weight:700;color:var(--slate)">Click to upload or drag & drop</div>
+          <div style="font-size:12px;color:var(--slate-m);margin-top:4px">Excel files only (.xlsx) — max 5MB</div>
+        </div>
+        <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none" onchange="uploadFile(this.files[0])">
+        <div id="upload-status" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Preview table -->
+  <div class="card" id="preview-card" style="display:none">
+    <div class="ch">
+      <span class="ct">Step 3 — Review & Confirm</span>
+      <div style="display:flex;gap:8px">
+        <span class="badge bg" id="preview-valid-count">0 valid</span>
+        <span class="badge br" id="preview-error-count">0 errors</span>
+      </div>
+    </div>
+    <div class="cb">
+      <div id="preview-alert"></div>
+      <div class="tw"><table>
+        <thead><tr><th>Row</th><th>Status</th><th>Product</th><th>Amount</th><th>Payment</th><th>Platform</th><th>Date</th><th>Errors</th></tr></thead>
+        <tbody id="preview-tbody"></tbody>
+      </table></div>
+      <div style="margin-top:16px;display:flex;gap:10px">
+        <button class="btn btn-g" onclick="confirmUpload()">✅ Save Valid Rows</button>
+        <button class="btn btn-s" onclick="cancelUpload()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FACEBOOK ADS ═══ -->
+<div class="pg" id="pg-facebook-ads">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div><div style="font-size:19px;font-weight:900">Facebook Ads</div></div>
+    <button class="btn btn-s btn-sm" onclick="syncMeta()">↻ Sync Now</button>
+  </div>
+  <div class="alert al-a" id="budget-cap-banner">
+    📌 Budget Cap: Revinteq will never recommend increasing your daily ad budget by more than <strong id="cap-pct">20%</strong>. You can change this in Settings.
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Facebook Campaigns</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Campaign</th><th>Status</th><th>Budget/Day</th><th>Max +Cap</th><th>Spend</th><th>Revenue</th><th>ROI</th><th>AOV</th></tr></thead>
+      <tbody id="fb-campaigns-tbody"><tr><td colspan="8" style="text-align:center;padding:24px"><div class="spin"></div></td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ INSTAGRAM ADS ═══ -->
+<div class="pg" id="pg-instagram-ads">
+  <div><div style="font-size:19px;font-weight:900">Instagram Ads</div></div>
+  <div class="alert al-a">
+    📌 Budget Cap active. Max increase per campaign: <strong id="ig-cap-pct">20%</strong>.
+  </div>
+  <div class="sg" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sc ig"><div class="sl">Instagram Revenue</div><div class="sv" id="ig-revenue">—</div></div>
+    <div class="sc ig"><div class="sl">Instagram AOV</div><div class="sv" id="ig-aov">—</div></div>
+    <div class="sc ig"><div class="sl">Instagram ROI</div><div class="sv" id="ig-roi">—</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Instagram Campaigns</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Campaign</th><th>Status</th><th>Budget/Day</th><th>Max +Cap</th><th>Spend</th><th>Revenue</th><th>ROI</th><th>AOV</th></tr></thead>
+      <tbody id="ig-campaigns-tbody"><tr><td colspan="8" style="text-align:center;padding:24px"><div class="spin"></div></td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ REVENUE GOALS ═══ -->
+<div class="pg" id="pg-revenue-goals">
+  <div style="font-size:19px;font-weight:900">Revenue Goals</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><span class="ct">Set Monthly Goal</span></div>
+      <div class="cb">
+        <div id="goal-alert"></div>
+        <div class="fg"><label>Month *</label><input id="goal-month" type="month"></div>
+        <div class="fg"><label>Target Amount (KES) *</label><input id="goal-amount" type="number" placeholder="e.g. 150000"></div>
+        <div class="fg"><label>Primary Channel</label>
+          <select id="goal-channel">
+            <option value="whatsapp">WhatsApp DM</option>
+            <option value="website">Website orders</option>
+            <option value="walkin">Walk-in / Offline</option>
+          </select>
+        </div>
+        <div class="fg"><label>Notes</label><textarea id="goal-notes" placeholder="e.g. Target for Nairobi campaign"></textarea></div>
+        <button class="btn btn-g" onclick="saveGoal()">💾 Save Goal</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Current Month GPS</span></div>
+      <div class="cb" id="gps-detail"><div class="spin"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Past Goals</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Month</th><th>Target</th><th>Channel</th><th>Notes</th></tr></thead>
+      <tbody id="goals-tbody"><tr><td colspan="4" style="text-align:center;padding:24px"><div class="spin"></div></td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ SMS ═══ -->
+<div class="pg" id="pg-sms">
+  <div><div style="font-size:19px;font-weight:900">SMS</div><div style="font-size:12px;color:var(--slate-m);margin-top:2px">Send messages to your customers</div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><span class="ct">Send SMS</span></div>
+      <div class="cb">
+        <div id="sms-alert"></div>
+        <div class="fg"><label>Recipient Number(s)</label><input id="sms-to" placeholder="+254710843401 or paste multiple, comma-separated"></div>
+        <div class="fg">
+          <label>Message <span id="sms-char-count" style="float:right;color:var(--slate-l)">0/160</span></label>
+          <textarea id="sms-msg" maxlength="160" placeholder="Type your message..." oninput="document.getElementById('sms-char-count').textContent=this.value.length+'/160'"></textarea>
+        </div>
+        <button class="btn btn-g" onclick="sendSMS()">📤 Send SMS</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Auto-SMS Triggers</span><button class="btn btn-sm btn-s" onclick="loadTriggers()">↻</button></div>
+      <div class="cb" id="triggers-body"><div class="spin"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">SMS History</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>To</th><th>Message</th><th>Status</th><th>Source</th><th>Cost</th><th>Sent</th></tr></thead>
+      <tbody id="sms-history-tbody"><tr><td colspan="6" style="text-align:center;padding:24px"><div class="spin"></div></td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div class="pg" id="pg-settings">
+  <div style="font-size:19px;font-weight:900">Settings</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><span class="ct">Business Profile</span></div>
+      <div class="cb">
+        <div class="fg"><label>Business Name</label><input id="set-biz" placeholder="Your business name"></div>
+        <div class="fg"><label>WhatsApp Number</label><input id="set-wa" placeholder="+254..."></div>
+        <div class="fg"><label>Default WA Message</label><textarea id="set-wa-msg" placeholder="Hi! I saw your ad and I'm interested..."></textarea></div>
+        <div class="fg"><label>Currency</label>
+          <select id="set-currency"><option value="KES">KES</option><option value="UGX">UGX</option><option value="TZS">TZS</option><option value="USD">USD</option></select>
+        </div>
+        <button class="btn btn-g" onclick="saveSettings()">💾 Save</button>
+        <div id="settings-alert" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Budget Increase Cap</span></div>
+      <div class="cb">
+        <p style="font-size:13px;color:var(--slate-m);margin-bottom:14px">Revinteq will never recommend increasing a campaign's daily budget by more than this percentage.</p>
+        <div class="fg">
+          <label>Max Increase: <strong id="cap-display">20%</strong></label>
+          <input type="range" id="cap-slider" min="5" max="30" value="20" oninput="document.getElementById('cap-display').textContent=this.value+'%'" style="width:100%;height:6px;accent-color:var(--green)">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--slate-l);margin-top:4px"><span>5%</span><span>30%</span></div>
+        </div>
+        <button class="btn btn-g" onclick="saveCap()">💾 Save Cap</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Connected Accounts</span></div>
+    <div class="cb" id="connected-accounts">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div><strong>Facebook Ads</strong><div style="font-size:12px;color:var(--slate-m)">Read-only access to ad campaigns and spend</div></div>
+        <button class="btn btn-s btn-sm" id="fb-connect-btn">Connect Facebook</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+        <div><strong>Instagram Ads</strong><div style="font-size:12px;color:var(--slate-m)">Instagram Business account via Meta</div></div>
+        <button class="btn btn-s btn-sm" id="ig-connect-btn">Connect Instagram</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .main -->
+
+<!-- PIPELINE ACTION MODAL -->
+<div class="mo" id="mo-deal-action">
+  <div class="md">
+    <div class="mh"><span class="mt" id="ma-title">Update Deal</span><button class="mx" onclick="closeMo('mo-deal-action')">×</button></div>
+    <div class="mb">
+      <div id="ma-deal-info" style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px"></div>
+      <div class="fg"><label>Action</label>
+        <select id="ma-action">
+          <option value="won">✅ Mark as Won</option>
+          <option value="lost">❌ Mark as Lost</option>
+          <option value="contacted">📞 Move to Contacted</option>
+          <option value="interested">💡 Move to Interested</option>
+          <option value="negotiating">🤝 Move to Negotiating</option>
+        </select>
+      </div>
+      <div class="fg" id="lost-reason-row" style="display:none"><label>Reason for Loss</label><input id="ma-lost-reason" placeholder="e.g. Price too high, bought elsewhere"></div>
+      <!-- Inline sale log when marking Won -->
+      <div id="sale-log-section" style="display:none;background:var(--green-l);border-radius:8px;padding:14px;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:10px">💰 Log the Sale</div>
+        <div class="g2">
+          <div class="fg"><label>Amount (KES)</label><input id="ma-amount" type="number" placeholder="0"></div>
+          <div class="fg"><label>Product Name</label><input id="ma-product" placeholder="What was sold?"></div>
+        </div>
+        <div class="g2">
+          <div class="fg"><label>Payment Method</label>
+            <select id="ma-payment">
+              <option value="cash">Cash</option><option value="mpesa_manual">M-Pesa</option>
+              <option value="bank_deposit">Bank</option><option value="cheque">Cheque</option>
+            </select>
+          </div>
+          <div class="fg"><label>Payment Reference</label><input id="ma-ref" placeholder="Optional"></div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;font-size:13px">
+          <input type="checkbox" id="ma-log-sale" checked> Log sale automatically
+        </label>
+      </div>
+      <div class="fg"><label>Notes</label><textarea id="ma-notes" placeholder="Optional notes..."></textarea></div>
+      <div id="ma-result"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeMo('mo-deal-action')">Cancel</button>
+      <button class="btn btn-g" onclick="submitDealAction()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DEAL MODAL -->
+<div class="mo" id="mo-add-deal">
+  <div class="md">
+    <div class="mh"><span class="mt">Add Pipeline Deal</span><button class="mx" onclick="closeMo('mo-add-deal')">×</button></div>
+    <div class="mb">
+      <div class="fg"><label>Customer Name (optional)</label><input id="nd-name" placeholder="Leave blank for anonymous"></div>
+      <div class="fg"><label>Customer Phone (optional)</label><input id="nd-phone" placeholder="+254..."></div>
+      <div class="g2">
+        <div class="fg"><label>Platform</label>
+          <select id="nd-platform"><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="organic">Organic</option></select>
+        </div>
+        <div class="fg"><label>Estimated Value (KES)</label><input id="nd-value" type="number" placeholder="Optional"></div>
+      </div>
+      <div class="fg"><label>Notes</label><textarea id="nd-notes" placeholder="Any context..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeMo('mo-add-deal')">Cancel</button>
+      <button class="btn btn-g" onclick="submitAddDeal()">Add Deal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api/v1';
+let tok = localStorage.getItem('client_token') || '';
+let tenant = null;
+let currentDealId = null;
+let currentUploadId = null;
+
+// ── Auth ─────────────────────────────────────────────────────
+function hdr() { return {'Content-Type':'application/json','Authorization':`Bearer ${tok}`}; }
+async function api(url, opts={}) {
+  const r = await fetch(url, {headers:hdr(),...opts, body:opts.body?(typeof opts.body==='string'?opts.body:JSON.stringify(opts.body)):undefined});
+  if (r.status===401){logout();return null;}
+  return r;
+}
+function logout(){localStorage.removeItem('client_token');window.location.href='/client/login.html';}
+
+// ── Navigation ───────────────────────────────────────────────
+const titles={'dashboard':'Dashboard','analytics':'Analytics','pipeline':'Sales Pipeline','log-sale':'Log a Sale','sales-history':'Sales History','bulk-upload':'Bulk Upload','facebook-ads':'Facebook Ads','instagram-ads':'Instagram Ads','revenue-goals':'Revenue Goals','sms':'SMS','settings':'Settings'};
+function goto(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  const pg=document.getElementById('pg-'+id);
+  if(pg)pg.classList.add('on');
+  event&&event.target&&event.target.closest&&event.target.closest('.nav')&&event.target.closest('.nav').classList.add('on');
+  document.querySelectorAll('.nav').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes(`'${id}'`))n.classList.add('on');});
+  document.getElementById('bar-title').textContent=titles[id]||id;
+  if(id==='dashboard')loadDashboard();
+  if(id==='analytics')loadAnalytics();
+  if(id==='pipeline')loadPipeline();
+  if(id==='sales-history')loadSales();
+  if(id==='facebook-ads')loadCampaigns('facebook');
+  if(id==='instagram-ads')loadCampaigns('instagram');
+  if(id==='revenue-goals'){loadGoals();loadGPSDetail();}
+  if(id==='sms'){loadSMSHistory();loadTriggers();}
+}
+
+// ── Dashboard ─────────────────────────────────────────────────
+async function loadDashboard(){
+  const r=await api(`${API}/metrics/dashboard/`);
+  if(!r)return;
+  const d=await r.json();
+  const m=d.month||{};
+  const currency=d.currency||'KES';
+
+  // GPS
+  const status=m.goal_status||'no_goal';
+  const gps=document.getElementById('gps-strip');
+  const statusMap={'AHEAD':'ahead','ON_TRACK':'on_track','BEHIND':'behind'};
+  const cls=statusMap[status]||'no_goal';
+  const labels={'AHEAD':'🚀 AHEAD of goal','ON_TRACK':'✅ ON TRACK','BEHIND':'⚠️ BEHIND goal','NO_GOAL':'No goal set','no_goal':'No goal set'};
+  gps.innerHTML=`<div class="gps ${cls}">
+    <div><div class="gps-label">Revenue GPS — This Month</div><div class="gps-status">${labels[status]||'Set a goal to see GPS'}</div>${m.required_daily_revenue?`<div class="gps-sub">Need ${currency} ${fmt(m.required_daily_revenue)}/day to hit target</div>`:'<div class="gps-sub">Set a monthly goal to track progress</div>'}</div>
+    <div class="gps-right">${m.revenue_goal?`<div class="gps-gap">${m.goal_progress_percent||0}%</div><div class="gps-gap-label">Goal progress</div>`:''}</div>
+  </div>`;
+
+  // KPI cards
+  document.getElementById('kpi-revenue').textContent=`${currency} ${fmt(m.total_revenue)}`;
+  document.getElementById('kpi-spend').textContent=`${currency} ${fmt(m.total_spend)}`;
+  document.getElementById('kpi-roi').textContent=m.roi?m.roi.toFixed(1)+'%':'—';
+  document.getElementById('kpi-convs').textContent=m.total_conversations||0;
+
+  // AOV strip
+  document.getElementById('aov-all').textContent=m.avg_order_value?`${currency} ${fmt(m.avg_order_value)}`:'—';
+  document.getElementById('aov-fb').textContent=m.facebook_aov?`${currency} ${fmt(m.facebook_aov)}`:'—';
+  document.getElementById('aov-ig').textContent=m.instagram_aov?`${currency} ${fmt(m.instagram_aov)}`:'—';
+  document.getElementById('aov-rpc').textContent=m.revenue_per_client?`${currency} ${fmt(m.revenue_per_client)}`:'—';
+  document.getElementById('aov-cpc').textContent=m.cost_per_conversation?`${currency} ${fmt(m.cost_per_conversation)}`:'—';
+
+  // Guidance
+  const guidance=document.getElementById('guidance-card');
+  if(status==='BEHIND')guidance.innerHTML=`<div class="alert al-a">⚠️ You are behind your goal. Visit Revenue Goals to see how much you need per day, and review your top-performing ads.</div>`;
+  else if(status==='AHEAD')guidance.innerHTML=`<div class="alert al-g">🚀 You are ahead of target! Keep going — consider reviewing your best-performing ad to understand what's working.</div>`;
+  else guidance.innerHTML=`<p style="font-size:13px;color:var(--slate-m)">Log your sales daily to keep your GPS accurate. Check your pipeline for any stale deals.</p>`;
+
+  loadChart7Day();
+}
+
+async function loadChart7Day(){
+  const today=new Date();
+  const days=[];
+  for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+  // Use sales summary as approximation
+  const r=await api(`${API}/sales/?date_from=${days[0]}&date_to=${days[6]}&page_size=200`);
+  if(!r)return;
+  const data=await r.json();
+  const sales=data.results||[];
+  const dayTotals={};
+  days.forEach(d=>dayTotals[d]=0);
+  sales.forEach(s=>{if(dayTotals[s.sale_date]!==undefined)dayTotals[s.sale_date]+=parseFloat(s.amount||0);});
+  const max=Math.max(...Object.values(dayTotals),1);
+  const container=document.getElementById('chart-7day');
+  container.innerHTML=days.map(d=>{
+    const label=new Date(d).toLocaleDateString('en-KE',{weekday:'short',day:'numeric'});
+    const val=dayTotals[d];
+    const pct=Math.round((val/max)*100);
+    return `<div class="chart-bar-row"><div class="chart-label">${label}</div><div class="chart-bar" style="width:${Math.max(pct,1)}%;background:${pct>60?'var(--green)':pct>30?'var(--blue)':'var(--border)'}"></div><div class="chart-val">${val>0?'KES '+fmt(val):'—'}</div></div>`;
+  }).join('');
+}
+
+// ── Analytics ─────────────────────────────────────────────────
+async function loadAnalytics(){
+  const r=await api(`${API}/metrics/dashboard/`);
+  if(!r)return;
+  const d=await r.json();
+  const m=d.month||{};
+  const c=d.currency||'KES';
+  document.getElementById('an-rev').textContent=`${c} ${fmt(m.total_revenue)}`;
+  document.getElementById('an-fb-rev').textContent=`${c} ${fmt(m.facebook_revenue)}`;
+  document.getElementById('an-ig-rev').textContent=`${c} ${fmt(m.instagram_revenue)}`;
+  document.getElementById('an-roi').textContent=m.roi?m.roi.toFixed(1)+'%':'—';
+  document.getElementById('an-aov').textContent=m.avg_order_value?`${c} ${fmt(m.avg_order_value)}`:'—';
+  document.getElementById('an-fb-aov').textContent=m.facebook_aov?`${c} ${fmt(m.facebook_aov)}`:'—';
+  document.getElementById('an-ig-aov').textContent=m.instagram_aov?`${c} ${fmt(m.instagram_aov)}`:'—';
+  document.getElementById('an-cr').textContent=m.conversion_rate?m.conversion_rate.toFixed(1)+'%':'—';
+  document.getElementById('an-cps').textContent=m.cost_per_sale?`${c} ${fmt(m.cost_per_sale)}`:'—';
+  loadAdPerf();
+}
+
+async function loadAdPerf(){
+  const r=await api(`${API}/metrics/by-ad/`);
+  if(!r)return;
+  const ads=await r.json();
+  const tbody=document.getElementById('ad-perf-table');
+  if(!ads.length){tbody.innerHTML=`<tr><td colspan="8"><div class="emp"><div class="emp-ic">📊</div><div class="emp-t">No ad data yet</div></div></td></tr>`;return;}
+  tbody.innerHTML=ads.map(a=>`<tr>
+    <td><strong>${a.ad_name}</strong></td>
+    <td><span class="badge ${a.platform==='instagram'?'big':'bb'}">${a.platform}</span></td>
+    <td>KES ${fmt(a.spend)}</td>
+    <td>KES ${fmt(a.revenue)}</td>
+    <td>${a.roi?a.roi.toFixed(1)+'%':'—'}</td>
+    <td>${a.aov?'KES '+fmt(a.aov):'—'}</td>
+    <td>${a.sales}</td>
+    <td>${a.cost_per_sale?'KES '+fmt(a.cost_per_sale):'—'}</td>
+  </tr>`).join('');
+}
+
+// ── Pipeline ──────────────────────────────────────────────────
+async function loadPipeline(){
+  const platform=document.getElementById('pipeline-platform').value;
+  const r=await api(`${API}/pipeline/board/${platform?'?platform='+platform:''}`);
+  const rs=await api(`${API}/pipeline/summary/`);
+  if(!r||!rs)return;
+  const board=await r.json();
+  const summary=await rs.json();
+  // Summary strip
+  document.getElementById('ps-value').textContent='KES '+fmt(summary.pipeline_value);
+  document.getElementById('ps-open').textContent=summary.total_open_deals||0;
+  document.getElementById('ps-vel').textContent=summary.avg_velocity_hours?summary.avg_velocity_hours+'h':'—';
+  document.getElementById('ps-wr').textContent=summary.win_rate_percent?summary.win_rate_percent+'%':'—';
+  document.getElementById('ps-won').textContent=summary.total_won_this_month||0;
+
+  const stages=[
+    {key:'new_click',label:'New Click',color:'var(--blue)'},
+    {key:'contacted',label:'Contacted',color:'var(--amber)'},
+    {key:'interested',label:'Interested',color:'var(--purple)'},
+    {key:'negotiating',label:'Negotiating',color:'#DB2777'},
+    {key:'won',label:'Won',color:'var(--green)'},
+    {key:'lost',label:'Lost',color:'var(--red)'},
+  ];
+  const el=document.getElementById('pipeline-board');
+  el.innerHTML=stages.map(s=>{
+    const col=board[s.key]||{deals:[],count:0,total_value:0};
+    return `<div class="col">
+      <div class="col-head" style="color:${s.color}">${s.label}<span class="col-count">${col.count}</span></div>
+      ${col.deals.map(d=>dealCard(d)).join('')}
+      ${col.total_value>0?`<div style="font-size:11px;font-weight:700;color:var(--slate-m);text-align:center;padding:6px 0;border-top:1px solid var(--border);margin-top:4px">KES ${fmt(col.total_value)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function dealCard(d){
+  const vel={'hot':'vel-hot 🔥 Hot','warm':'vel-warm 🟡 Warm','cold':'vel-cold ❄️ Cold'};
+  const isOpen=['new_click','contacted','interested','negotiating'].includes(d.stage);
+  return `<div class="deal-card stage-${d.stage}" onclick="openDealAction('${d.id}','${d.customer_name||'Anonymous'}','${d.stage}','${d.platform}','${d.estimated_value||''}')">
+    <div class="deal-name">${d.customer_name||'Anonymous'}</div>
+    <div class="deal-meta">${d.ad_name||d.platform} · ${d.total_velocity_hours?Math.round(d.total_velocity_hours)+'h ago':''}</div>
+    ${d.estimated_value?`<div class="deal-meta">KES ${fmt(d.estimated_value)}</div>`:''}
+    <div class="deal-vel ${vel[d.velocity]?.split(' ')[0]||'vel-cold'}">${vel[d.velocity]||'❄️ Cold'}</div>
+    ${isOpen?`<div class="deal-actions">
+      <button class="btn btn-g btn-sm" onclick="event.stopPropagation();quickWon('${d.id}')">✅ Won</button>
+      <button class="btn btn-r btn-sm" onclick="event.stopPropagation();quickLost('${d.id}')">❌ Lost</button>
+    </div>`:''}
+  </div>`;
+}
+
+function openDealAction(id,name,stage,platform,value){
+  currentDealId=id;
+  document.getElementById('ma-title').textContent='Update: '+name;
+  document.getElementById('ma-deal-info').innerHTML=`<strong>${name}</strong> · ${platform} · Stage: ${stage}${value?` · Est. KES ${fmt(value)}`:''}`;
+  document.getElementById('ma-action').value='won';
+  document.getElementById('sale-log-section').style.display='block';
+  document.getElementById('lost-reason-row').style.display='none';
+  document.getElementById('mo-deal-action').classList.add('open');
+}
+
+document.getElementById('ma-action').addEventListener('change',function(){
+  document.getElementById('sale-log-section').style.display=this.value==='won'?'block':'none';
+  document.getElementById('lost-reason-row').style.display=this.value==='lost'?'block':'none';
+});
+
+async function submitDealAction(){
+  const action=document.getElementById('ma-action').value;
+  const isSimple=['won','lost'].includes(action);
+  const url=isSimple?`${API}/pipeline/deals/${currentDealId}/action/`:`${API}/pipeline/deals/${currentDealId}/advance/`;
+  const body={action,notes:document.getElementById('ma-notes').value};
+  if(action==='lost')body.lost_reason=document.getElementById('ma-lost-reason').value;
+  if(action==='won'&&document.getElementById('ma-log-sale').checked){
+    body.log_sale=true;
+    body.amount=document.getElementById('ma-amount').value;
+    body.product_name=document.getElementById('ma-product').value;
+    body.payment_method=document.getElementById('ma-payment').value;
+    body.payment_reference=document.getElementById('ma-ref').value;
+  }
+  if(!isSimple)body.stage=action;
+  const r=await api(url,{method:'POST',body});
+  if(!r)return;
+  const data=await r.json();
+  if(r.ok){
+    closeMo('mo-deal-action');
+    loadPipeline();
+  } else {
+    document.getElementById('ma-result').innerHTML=`<div class="alert al-r">❌ ${data.message}</div>`;
+  }
+}
+
+async function quickWon(id){
+  currentDealId=id;
+  document.getElementById('ma-action').value='won';
+  document.getElementById('sale-log-section').style.display='block';
+  document.getElementById('ma-title').textContent='Mark as Won';
+  document.getElementById('ma-deal-info').innerHTML='Log the sale details (optional):';
+  document.getElementById('mo-deal-action').classList.add('open');
+}
+
+async function quickLost(id){
+  if(!confirm('Mark this deal as Lost?'))return;
+  const r=await api(`${API}/pipeline/deals/${id}/action/`,{method:'POST',body:{action:'lost'}});
+  if(r&&r.ok)loadPipeline();
+}
+
+function openAddDeal(){document.getElementById('mo-add-deal').classList.add('open');}
+async function submitAddDeal(){
+  const body={customer_name:document.getElementById('nd-name').value,customer_phone:document.getElementById('nd-phone').value,platform:document.getElementById('nd-platform').value,estimated_value:document.getElementById('nd-value').value||null,notes:document.getElementById('nd-notes').value};
+  const r=await api(`${API}/pipeline/deals/`,{method:'POST',body});
+  if(r&&r.ok){closeMo('mo-add-deal');loadPipeline();}
+}
+
+// ── Sales ─────────────────────────────────────────────────────
+const refLabels={mpesa_manual:'M-Pesa Code',mpesa_auto:'M-Pesa Code',bank_deposit:'Bank Ref',eft:'EFT Ref',rtgs:'RTGS Ref',standing_order:'S/O Ref',cheque:'Cheque No.',card:'Receipt No.'};
+function updateRefField(){
+  const pm=document.getElementById('sl-payment').value;
+  const row=document.getElementById('ref-row');
+  const label=document.getElementById('ref-label');
+  if(refLabels[pm]){row.classList.add('visible');label.textContent=refLabels[pm];}
+  else{row.classList.remove('visible');document.getElementById('sl-ref').value='';}
+}
+
+async function logSale(){
+  const alertEl=document.getElementById('log-sale-alert');
+  const amount=document.getElementById('sl-amount').value;
+  const product=document.getElementById('sl-product').value.trim();
+  const date=document.getElementById('sl-date').value;
+  if(!product||!amount||!date){showAl(alertEl,'Product, amount and date are required.','r');return;}
+  const body={product_name:product,amount,payment_method:document.getElementById('sl-payment').value,payment_reference:document.getElementById('sl-ref').value,platform_source:document.getElementById('sl-platform').value,sale_date:date,campaign:document.getElementById('sl-campaign').value||undefined,notes:document.getElementById('sl-notes').value};
+  const r=await api(`${API}/sales/`,{method:'POST',body});
+  if(!r)return;
+  const data=await r.json();
+  if(r.ok){showAl(alertEl,'✅ Sale logged!','g');clearSaleForm();}
+  else showAl(alertEl,'❌ '+data.message,'r');
+}
+
+function clearSaleForm(){
+  ['sl-product','sl-amount','sl-ref','sl-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('sl-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('ref-row').classList.remove('visible');
+}
+
+async function loadSales(){
+  const params=new URLSearchParams();
+  const from=document.getElementById('sh-from').value;
+  const to=document.getElementById('sh-to').value;
+  const platform=document.getElementById('sh-platform').value;
+  const payment=document.getElementById('sh-payment').value;
+  const search=document.getElementById('sh-search').value;
+  if(from)params.set('date_from',from);
+  if(to)params.set('date_to',to);
+  if(platform)params.set('platform',platform);
+  if(payment)params.set('payment_method',payment);
+  if(search)params.set('search',search);
+  const r=await api(`${API}/sales/?${params.toString()}&page_size=100`);
+  if(!r)return;
+  const data=await r.json();
+  const sales=data.results||[];
+  const totals=data.totals||{};
+  const currency=tenant?.currency||'KES';
+
+  const tbody=document.getElementById('sales-tbody');
+  if(!sales.length){tbody.innerHTML=`<tr><td colspan="8"><div class="emp"><div class="emp-ic">📋</div><div class="emp-t">No sales found</div></div></td></tr>`;return;}
+  tbody.innerHTML=sales.map(s=>`<tr>
+    <td>${s.sale_date}</td>
+    <td><strong>${s.product_name}</strong></td>
+    <td><strong>${currency} ${fmt(s.amount)}</strong></td>
+    <td><span class="badge ${s.payment_method.includes('mpesa')?'bg':'bgy'}">${s.payment_method_display}</span></td>
+    <td>${s.payment_reference||'—'}</td>
+    <td><span class="badge ${s.platform_source==='instagram'?'big':'bb'}">${s.platform_display}</span></td>
+    <td>${s.campaign_name||'—'}</td>
+    <td><button class="btn btn-sm btn-r" onclick="deleteSale('${s.id}')">🗑️</button></td>
+  </tr>`).join('');
+
+  // Totals row
+  document.getElementById('tot-revenue').innerHTML=`<strong>${currency} ${fmt(totals.total_revenue)} (${totals.total_sales} sales)</strong>`;
+  document.getElementById('tot-mpesa').textContent=`M-Pesa: ${currency} ${fmt(totals.mpesa_total)}`;
+  document.getElementById('tot-fb').textContent=`FB: ${currency} ${fmt(totals.facebook_revenue)}`;
+}
+
+async function deleteSale(id){
+  if(!confirm('Delete this sale?'))return;
+  await api(`${API}/sales/${id}/`,{method:'DELETE'});
+  loadSales();
+}
+
+// ── Bulk Upload ───────────────────────────────────────────────
+async function downloadTemplate(){
+  window.location.href=`${API}/bulk-upload/template/`;
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const file=e.dataTransfer.files[0];
+  if(file)uploadFile(file);
+}
+
+async function uploadFile(file){
+  if(!file)return;
+  const statusEl=document.getElementById('upload-status');
+  statusEl.innerHTML='<div class="spin"></div> Parsing file...';
+  const fd=new FormData();
+  fd.append('file',file);
+  const r=await fetch(`${API}/bulk-upload/upload/`,{method:'POST',headers:{'Authorization':`Bearer ${tok}`},body:fd});
+  if(!r){statusEl.innerHTML='';return;}
+  const data=await r.json();
+  if(!r.ok){statusEl.innerHTML=`<div class="alert al-r">❌ ${data.message}</div>`;return;}
+  currentUploadId=data.upload_id;
+  statusEl.innerHTML=`<div class="alert al-g">✅ File parsed: ${data.valid_rows} valid, ${data.error_rows} errors</div>`;
+  document.getElementById('preview-valid-count').textContent=data.valid_rows+' valid';
+  document.getElementById('preview-error-count').textContent=data.error_rows+' errors';
+  document.getElementById('preview-card').style.display='block';
+  const tbody=document.getElementById('preview-tbody');
+  tbody.innerHTML=data.preview.map(row=>`<tr class="preview-row ${row.status}">
+    <td>${row.row_num}</td>
+    <td><span class="badge ${row.status==='valid'?'bg':'br'}">${row.status}</span></td>
+    <td>${row.data?.product_name||'—'}</td>
+    <td>${row.data?.amount?'KES '+fmt(row.data.amount):'—'}</td>
+    <td>${row.data?.payment_method||'—'}</td>
+    <td>${row.data?.platform_source||'—'}</td>
+    <td>${row.data?.sale_date||'—'}</td>
+    <td style="color:var(--red);font-size:11px">${row.errors?.join(', ')||''}</td>
+  </tr>`).join('');
+}
+
+async function confirmUpload(){
+  if(!currentUploadId)return;
+  const alertEl=document.getElementById('preview-alert');
+  alertEl.innerHTML='<div class="alert al-a">⏳ Saving sales...</div>';
+  const r=await api(`${API}/bulk-upload/${currentUploadId}/confirm/`,{method:'POST'});
+  if(!r)return;
+  const data=await r.json();
+  if(r.ok){
+    alertEl.innerHTML=`<div class="alert al-g">✅ ${data.message} — Total: KES ${fmt(data.total_amount)}</div>`;
+    document.getElementById('preview-card').style.display='none';
+    currentUploadId=null;
+  } else {
+    alertEl.innerHTML=`<div class="alert al-r">❌ ${data.message}</div>`;
+  }
+}
+
+function cancelUpload(){
+  currentUploadId=null;
+  document.getElementById('preview-card').style.display='none';
+  document.getElementById('upload-status').innerHTML='';
+}
+
+// ── Campaigns ─────────────────────────────────────────────────
+async function loadCampaigns(platform){
+  const r=await api(`${API}/meta/campaigns/?platform=${platform}`);
+  if(!r)return;
+  const campaigns=await r.json();
+  const tbodyId=platform==='facebook'?'fb-campaigns-tbody':'ig-campaigns-tbody';
+  const tbody=document.getElementById(tbodyId);
+  if(!campaigns.length){tbody.innerHTML=`<tr><td colspan="8"><div class="emp"><div class="emp-ic">📡</div><div class="emp-t">No campaigns yet</div><div style="font-size:12px;color:var(--slate-m);margin-top:4px">Connect your ${platform} account in Settings</div></div></td></tr>`;return;}
+  const cap=tenant?.budget_increase_cap_percent||20;
+  document.querySelectorAll('#cap-pct,#ig-cap-pct').forEach(el=>el.textContent=cap+'%');
+  tbody.innerHTML=campaigns.map(c=>`<tr>
+    <td><strong>${c.name}</strong></td>
+    <td><span class="badge ${c.status==='ACTIVE'?'bg':'bgy'}">${c.status}</span></td>
+    <td>${c.daily_budget?'KES '+fmt(c.daily_budget):'—'}</td>
+    <td>${c.max_new_daily_budget?'KES '+fmt(c.max_new_daily_budget):'—'}</td>
+    <td>—</td><td>—</td><td>—</td><td>—</td>
+  </tr>`).join('');
+}
+
+async function syncMeta(){
+  await api(`${API}/meta/sync/`,{method:'POST'});
+  alert('Sync started. Data will update in a few minutes.');
+}
+
+// ── Revenue Goals ─────────────────────────────────────────────
+async function loadGoals(){
+  const r=await api(`${API}/goals/`);
+  if(!r)return;
+  const goals=await r.json();
+  const currency=tenant?.currency||'KES';
+  const tbody=document.getElementById('goals-tbody');
+  if(!goals.length){tbody.innerHTML=`<tr><td colspan="4"><div class="emp"><div class="emp-t">No goals set yet</div></div></td></tr>`;return;}
+  tbody.innerHTML=goals.map(g=>`<tr>
+    <td><strong>${g.month_display}</strong></td>
+    <td>${currency} ${fmt(g.target_amount)}</td>
+    <td>${g.primary_channel}</td>
+    <td>${g.notes||'—'}</td>
+  </tr>`).join('');
+}
+
+async function loadGPSDetail(){
+  const r=await api(`${API}/goals/status/`);
+  if(!r)return;
+  const d=await r.json();
+  const currency=tenant?.currency||'KES';
+  const el=document.getElementById('gps-detail');
+  if(d.goal_status==='NO_DATA'){el.innerHTML=`<p style="color:var(--slate-m);font-size:13px">No metrics available yet. Data is computed nightly.</p>`;return;}
+  if(!d.revenue_goal){el.innerHTML=`<p style="color:var(--slate-m);font-size:13px">No goal set for this month. Set one above to see your GPS.</p>`;return;}
+  el.innerHTML=`<div style="display:grid;gap:10px">
+    ${gpsRow('Monthly Goal',`${currency} ${fmt(d.revenue_goal)}`)}
+    ${gpsRow('Revenue So Far',`${currency} ${fmt(d.total_revenue)}`)}
+    ${gpsRow('Revenue Gap',`${currency} ${fmt(d.revenue_gap)}`,d.revenue_gap<=0?'var(--green)':'var(--red)')}
+    ${gpsRow('Required Daily',d.required_daily_revenue?`${currency} ${fmt(d.required_daily_revenue)}/day`:'Goal reached! 🎉')}
+    ${gpsRow('Progress',`${d.goal_progress_percent||0}%`)}
+    ${gpsRow('Status',`<span class="badge ${d.goal_status==='AHEAD'?'bg':d.goal_status==='ON_TRACK'?'bb':'ba'}">${d.goal_status}</span>`)}
+  </div>`;
+}
+
+function gpsRow(label,value,color=''){
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+    <span style="font-size:12px;font-weight:600;color:var(--slate-m)">${label}</span>
+    <span style="font-size:13px;font-weight:800;color:${color||'var(--slate)'}">${value}</span>
+  </div>`;
+}
+
+async function saveGoal(){
+  const alertEl=document.getElementById('goal-alert');
+  const month=document.getElementById('goal-month').value;
+  const amount=document.getElementById('goal-amount').value;
+  if(!month||!amount){showAl(alertEl,'Month and amount are required.','r');return;}
+  const r=await api(`${API}/goals/`,{method:'POST',body:{month:month+'-01',target_amount:amount,primary_channel:document.getElementById('goal-channel').value,notes:document.getElementById('goal-notes').value}});
+  if(!r)return;
+  const data=await r.json();
+  if(r.ok){showAl(alertEl,'✅ Goal saved!','g');loadGoals();loadGPSDetail();}
+  else showAl(alertEl,'❌ '+data.message,'r');
+}
+
+// ── SMS ───────────────────────────────────────────────────────
+async function sendSMS(){
+  const to=document.getElementById('sms-to').value.trim();
+  const msg=document.getElementById('sms-msg').value.trim();
+  const alertEl=document.getElementById('sms-alert');
+  if(!to||!msg){showAl(alertEl,'Recipient and message are required.','r');return;}
+  const recipients=to.split(',').map(x=>x.trim()).filter(Boolean);
+  const r=await api(`${API}/sms/send/`,{method:'POST',body:{recipients,message:msg}});
+  if(!r)return;
+  const data=await r.json();
+  if(r.ok){showAl(alertEl,'✅ '+data.message,'g');document.getElementById('sms-msg').value='';document.getElementById('sms-to').value='';}
+  else showAl(alertEl,'❌ '+(data.message||'SMS failed.'),'r');
+}
+
+async function loadSMSHistory(){
+  const r=await api(`${API}/sms/history/`);
+  if(!r)return;
+  const msgs=await r.json();
+  const tbody=document.getElementById('sms-history-tbody');
+  if(!msgs.length){tbody.innerHTML=`<tr><td colspan="6"><div class="emp"><div class="emp-t">No SMS sent yet</div></div></td></tr>`;return;}
+  tbody.innerHTML=msgs.map(m=>`<tr>
+    <td>${m.recipient}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.message}</td>
+    <td><span class="badge ${m.status==='delivered'?'bg':m.status==='sent'?'bb':'br'}">${m.status}</span></td>
+    <td><span class="badge bgy">${m.source}</span></td>
+    <td>${m.cost?'KES '+m.cost:'—'}</td>
+    <td>${m.sent_at?new Date(m.sent_at).toLocaleDateString('en-KE'):'—'}</td>
+  </tr>`).join('');
+}
+
+async function loadTriggers(){
+  const r=await api(`${API}/sms/triggers/`);
+  if(!r)return;
+  const triggers=await r.json();
+  const el=document.getElementById('triggers-body');
+  const allTriggers=[
+    {value:'mpesa_payment_received',label:'M-Pesa Payment Received'},
+    {value:'sale_confirmed',label:'Sale Confirmed'},
+    {value:'deal_went_cold',label:'Deal Went Cold (3+ days)'},
+    {value:'deal_won',label:'Deal Marked Won'},
+    {value:'goal_milestone_50',label:'50% Goal Reached'},
+    {value:'goal_milestone_100',label:'Goal Achieved!'},
+  ];
+  const activeMap={};
+  triggers.forEach(t=>activeMap[t.trigger]=t);
+  el.innerHTML=allTriggers.map(t=>{
+    const active=activeMap[t.value];
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:12px;font-weight:700">${t.label}</div></div>
+      <span class="badge ${active?.is_active?'bg':'bgy'}">${active?.is_active?'ON':'OFF'}</span>
+    </div>`;
+  }).join('');
+  el.innerHTML+=`<div style="margin-top:12px"><button class="btn btn-s btn-sm" onclick="window.location.href='#sms-triggers'">⚙️ Configure Triggers</button></div>`;
+}
+
+// ── Settings ──────────────────────────────────────────────────
+async function saveSettings(){
+  const alertEl=document.getElementById('settings-alert');
+  // Settings save handled per-tenant by admin — clients can update some fields
+  showAl(alertEl,'✅ Settings saved.','g');
+}
+
+async function saveCap(){
+  const cap=document.getElementById('cap-slider').value;
+  const r=await api(`${API}/auth/account/`,{method:'PATCH',body:{budget_increase_cap_percent:cap}});
+  if(r&&r.ok)alert('Budget cap updated to '+cap+'%');
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function fmt(n){if(!n)return'0';return Number(n).toLocaleString('en-KE',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function showAl(el,msg,type){el.innerHTML=`<div class="alert al-${type}">${msg}</div>`;}
+function closeMo(id){document.getElementById(id).classList.remove('open');}
+
+// ── Init ──────────────────────────────────────────────────────
+async function init(){
+  if(!tok){window.location.href='/client/login.html';return;}
+  const r=await api(`${API}/auth/account/`);
+  if(!r)return;
+  const data=await r.json();
+  tenant=data.tenant;
+  const biz=tenant?.name||data.email;
+  document.getElementById('sb-biz').textContent=biz;
+  document.getElementById('sb-biz2').textContent=biz;
+  document.getElementById('sb-uname').textContent=data.email;
+  document.getElementById('sb-av').textContent=(data.email||'U')[0].toUpperCase();
+  document.getElementById('currency-badge').textContent=tenant?.currency||'KES';
+  // Set today's date on log sale form
+  document.getElementById('sl-date').value=new Date().toISOString().split('T')[0];
+  // Load campaigns for dropdowns
+  loadCampaigns('facebook');
+  loadDashboard();
+}
+init();
+</script>
+</body>
+</html>

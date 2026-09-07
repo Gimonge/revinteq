@@ -1,0 +1,54 @@
+# Revinteq v3 — Production Dependencies
+# Python 3.12
+
+# Core
+Django==5.0.6
+djangorestframework==3.15.2
+django-cors-headers==4.4.0
+
+# Auth
+djangorestframework-simplejwt==5.3.1
+
+# Database
+psycopg2-binary==2.9.9
+python-decouple==3.8
+
+# Field encryption (Meta tokens, Daraja keys, AT keys)
+cryptography==42.0.8
+
+# Task queue
+celery==5.4.0
+django-celery-beat==2.6.0
+django-celery-results==2.5.1
+redis==5.0.8
+
+# HTTP
+requests==2.32.3
+
+# Data & Excel
+pandas==2.2.2
+numpy==2.0.1
+openpyxl==3.1.2
+
+# Unique IDs
+shortuuid==1.0.13
+
+# API documentation
+drf-spectacular==0.27.2
+
+# Africa's Talking SMS
+africastalking==1.2.9
+
+# Security
+django-axes==6.5.0
+
+# WSGI server (production)
+gunicorn==22.0.0
+
+# Utilities
+python-dateutil==2.9.0
+pytz==2024.1
+Pillow==10.4.0
+
+# Development only
+django-debug-toolbar==4.4.6

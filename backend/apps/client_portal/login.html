@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revinteq — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#1F7A4C;--green-d:#155c38;--green-l:#E8F5EE;
+  --blue:#2563EB;--blue-l:#EFF6FF;
+  --slate:#1E293B;--slate-m:#475569;--slate-l:#94A3B8;
+  --bg:#F8FAFC;--card:#fff;--border:#E2E8F0;
+  --red:#EF4444;--red-l:#FEF2F2;
+  --font:'Nunito',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;-webkit-font-smoothing:antialiased}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.wrap{width:100%;max-width:420px;animation:fadeUp .5s ease}
+
+.brand{text-align:center;margin-bottom:32px}
+.logo{font-size:32px;font-weight:900;letter-spacing:-.5px}
+.logo span{background:linear-gradient(135deg,#34d399,#1F7A4C);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-sub{font-size:13px;color:var(--slate-l);font-weight:600;margin-top:8px}
+.tenant-name{font-size:14px;font-weight:800;color:var(--green);margin-top:6px}
+
+.card{background:var(--card);border-radius:18px;border:1px solid var(--border);padding:36px;box-shadow:0 10px 40px rgba(0,0,0,.07)}
+
+.card-title{font-size:20px;font-weight:900;color:var(--slate);margin-bottom:6px;letter-spacing:-.3px}
+.card-sub{font-size:13px;color:var(--slate-l);font-weight:600;margin-bottom:28px}
+
+.form-group{margin-bottom:18px}
+label{display:block;font-size:11.5px;font-weight:800;color:var(--slate-m);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);color:var(--slate);font-weight:600;background:var(--card);outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,122,76,.1)}
+
+.btn{width:100%;padding:13px;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;border:none;font-family:var(--font);background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(31,122,76,.3);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px}
+.btn:hover{background:var(--green-d);transform:translateY(-1px)}
+.btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
+
+.error{background:var(--red-l);border:1.5px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;font-weight:700;color:#991b1b;margin-bottom:16px;display:none}
+.error.show{display:block}
+
+.success{background:var(--green-l);border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;font-size:13px;font-weight:700;color:var(--green-d);margin-bottom:16px;display:none}
+.success.show{display:block}
+
+.footer-note{text-align:center;margin-top:20px;font-size:12px;color:var(--slate-l);font-weight:600}
+.footer-note a{color:var(--green);text-decoration:none;font-weight:700}
+
+.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.spinner.show{display:block}
+
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0}
+.tab{padding:10px 0;font-size:13px;font-weight:800;color:var(--slate-l);cursor:pointer;flex:1;text-align:center;border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px}
+.tab.on{color:var(--green);border-bottom-color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <div class="logo"><span>Revinteq</span></div>
+    <div class="brand-sub">Revenue Intelligence Platform</div>
+    <div class="tenant-name" id="tenant-display" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <div class="tab-bar" id="tab-bar">
+      <div class="tab on" onclick="switchTab('login', this)">Sign In</div>
+      <div class="tab" onclick="switchTab('invite', this)">Accept Invitation</div>
+    </div>
+
+    <!-- LOGIN PANEL -->
+    <div id="panel-login">
+      <div class="card-sub" style="margin-bottom:20px">Sign in to your Revinteq dashboard</div>
+      <div class="error" id="login-error"></div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="l-email" placeholder="you@business.co.ke" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="l-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+      </div>
+      <button class="btn" id="login-btn" onclick="login()">
+        <span id="login-txt">Sign In</span>
+        <div class="spinner" id="login-spin"></div>
+      </button>
+    </div>
+
+    <!-- INVITE PANEL -->
+    <div id="panel-invite" style="display:none">
+      <div class="card-sub" style="margin-bottom:20px">Enter the invitation token from your email and set your password</div>
+      <div class="error"   id="invite-error"></div>
+      <div class="success" id="invite-success"></div>
+      <div class="form-group">
+        <label>Invitation Token</label>
+        <input type="text" id="inv-token" placeholder="Paste your invitation token here">
+      </div>
+      <div class="form-group">
+        <label>Your Full Name</label>
+        <input type="text" id="inv-name" placeholder="e.g. Aisha Mohamed">
+      </div>
+      <div class="form-group">
+        <label>Set Password</label>
+        <input type="password" id="inv-password" placeholder="Min 8 characters">
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="inv-confirm" placeholder="Repeat password">
+      </div>
+      <button class="btn" id="invite-btn" onclick="acceptInvite()">
+        <span id="invite-txt">Activate Account</span>
+        <div class="spinner" id="invite-spin"></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Are you a Gimsc admin? <a href="/admin-portal/login.html">Admin Portal →</a>
+  </div>
+</div>
+
+<script>
+const API = '/api/v1';
+
+// Pre-fill token from URL ?token=xxx
+const urlToken = new URLSearchParams(window.location.search).get('token');
+if (urlToken) {
+  document.getElementById('inv-token').value = urlToken;
+  switchTab('invite', document.querySelectorAll('.tab')[1]);
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('panel-login').style.display  = name === 'login'  ? 'block' : 'none';
+  document.getElementById('panel-invite').style.display = name === 'invite' ? 'block' : 'none';
+}
+
+async function login() {
+  const email    = document.getElementById('l-email').value.trim();
+  const password = document.getElementById('l-password').value;
+  const errEl    = document.getElementById('login-error');
+  errEl.classList.remove('show');
+
+  if (!email || !password) {
+    errEl.textContent = 'Email and password are required.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  setLoading('login-btn', 'login-txt', 'login-spin', 'Signing in...');
+  try {
+    const res  = await fetch(`${API}/auth/login/`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email, password}),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.message || 'Login failed.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    // Redirect admins to admin portal
+    if (['SUPER_ADMIN', 'ADMIN'].includes(data.user?.role)) {
+      localStorage.setItem('admin_token',   data.access);
+      localStorage.setItem('admin_refresh', data.refresh);
+      window.location.href = '/admin-portal/index.html';
+      return;
+    }
+
+    // Client login
+    localStorage.setItem('client_token',   data.access);
+    localStorage.setItem('client_refresh', data.refresh);
+    localStorage.setItem('client_user',    JSON.stringify(data.user));
+    localStorage.setItem('client_tenant',  JSON.stringify(data.tenant));
+    window.location.href = '/';
+
+  } catch (err) {
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.classList.add('show');
+  } finally {
+    resetLoading('login-btn', 'login-txt', 'login-spin', 'Sign In');
+  }
+}
+
+async function acceptInvite() {
+  const token    = document.getElementById('inv-token').value.trim();
+  const name     = document.getElementById('inv-name').value.trim();
+  const password = document.getElementById('inv-password').value;
+  const confirm  = document.getElementById('inv-confirm').value;
+  const errEl    = document.getElementById('invite-error');
+  const sucEl    = document.getElementById('invite-success');
+  errEl.classList.remove('show');
+  sucEl.classList.remove('show');
+
+  if (!token || !password || !name) {
+    errEl.textContent = 'Token, name and password are required.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (password !== confirm) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (password.length < 8) {
+    errEl.textContent = 'Password must be at least 8 characters.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  setLoading('invite-btn', 'invite-txt', 'invite-spin', 'Activating...');
+  try {
+    const res  = await fetch(`${API}/tenants/accept-invite/`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token, full_name: name, password}),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.message || 'Activation failed.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    sucEl.textContent = `Welcome! Your account for ${data.tenant?.name || 'Revinteq'} is ready. Redirecting...`;
+    sucEl.classList.add('show');
+
+    localStorage.setItem('client_token',   data.tokens?.access  || '');
+    localStorage.setItem('client_refresh', data.tokens?.refresh || '');
+
+    setTimeout(() => { window.location.href = '/'; }, 1800);
+
+  } catch (err) {
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.classList.add('show');
+  } finally {
+    resetLoading('invite-btn', 'invite-txt', 'invite-spin', 'Activate Account');
+  }
+}
+
+function setLoading(btnId, txtId, spinId, msg) {
+  document.getElementById(btnId).disabled = true;
+  document.getElementById(txtId).textContent = msg;
+  document.getElementById(spinId).classList.add('show');
+}
+function resetLoading(btnId, txtId, spinId, msg) {
+  document.getElementById(btnId).disabled = false;
+  document.getElementById(txtId).textContent = msg;
+  document.getElementById(spinId).classList.remove('show');
+}
+</script>
+</body>
+</html>

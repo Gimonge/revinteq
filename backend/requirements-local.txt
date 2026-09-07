@@ -1,0 +1,43 @@
+# Revinteq v3 — Local Development Dependencies
+# Windows/Mac/Linux laptop — no compilation needed
+# Install: pip install -r requirements-local.txt
+
+# Core Django
+Django==5.0.6
+djangorestframework==3.15.2
+django-cors-headers==4.4.0
+
+# Auth
+djangorestframework-simplejwt==5.3.1
+
+# Config — reads .env files
+python-decouple==3.8
+
+# Field encryption
+cryptography==42.0.8
+
+# Task queue (runs synchronously in local dev — no Redis needed)
+celery==5.4.0
+django-celery-beat==2.6.0
+django-celery-results==2.5.1
+redis==5.0.8
+
+# HTTP
+requests==2.32.3
+
+# Excel upload — openpyxl only (no pandas build needed for local dev)
+openpyxl==3.1.2
+
+# Unique IDs
+shortuuid==1.0.13
+
+# API documentation
+drf-spectacular==0.27.2
+
+# Africa's Talking SMS
+africastalking==1.2.9
+
+# Utilities
+python-dateutil==2.9.0
+pytz==2024.1
+Pillow==10.4.0
