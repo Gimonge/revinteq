@@ -107,7 +107,7 @@ class PipelineBoardView(APIView):
 class PipelineDealListCreateView(APIView):
     """
     GET  /api/v1/pipeline/deals/  — list deals with filters
-    POST /api/v1/pipeline/deals/  — manually create a deal
+    POST /api/v1/pipeline/deals/  — retired; deals are only created from real ad clicks
     """
     permission_classes = [IsAuthenticated, IsClientOrAdmin]
 
@@ -116,24 +116,17 @@ class PipelineDealListCreateView(APIView):
             tenant=get_tenant(request)
         ).select_related('ad', 'campaign').order_by('-created_at')
 
-        if request.query_params.get('stage'):
-            deals = deals.filter(stage=request.query_params['stage'])
         if request.query_params.get('platform'):
             deals = deals.filter(platform=request.query_params['platform'])
         if request.query_params.get('velocity'):
             deals = deals.filter(velocity=request.query_params['velocity'])
-        if request.query_params.get('stale'):
-            deals = deals.filter(days_in_current_stage__gte=3)
 
-        # Totals
+        # Totals — only "synced to a sale via Kommo" matters now; internal
+        # stages (new_click/contacted/.../won/lost) are no longer tracked
+        # or shown, since Kommo owns the real pipeline.
         totals = deals.aggregate(
             total_deals=Count('id'),
-            total_estimated_value=Sum('estimated_value'),
-            open_deals=Count('id', filter=Q(
-                stage__in=['new_click','contacted','interested','negotiating']
-            )),
-            won_deals=Count('id', filter=Q(stage='won')),
-            lost_deals=Count('id', filter=Q(stage='lost')),
+            synced_to_sale=Count('id', filter=Q(sale__isnull=False)),
         )
 
         return Response({
@@ -142,18 +135,13 @@ class PipelineDealListCreateView(APIView):
         })
 
     def post(self, request):
-        serializer = PipelineDealSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        deal = serializer.save(
-            tenant=get_tenant(request),
-            stage='new_click',
-            new_click_at=timezone.now(),
-            source='manual',
-        )
-        return Response(
-            PipelineDealSerializer(deal).data,
-            status=status.HTTP_201_CREATED
-        )
+        return Response({
+            'error': True,
+            'message': (
+                'Manually adding pipeline deals has been retired. Pipeline '
+                'only shows deals created from real ad clicks.'
+            ),
+        }, status=status.HTTP_410_GONE)
 
 
 class PipelineDealDetailView(APIView):
@@ -191,7 +179,7 @@ class PipelineDealDetailView(APIView):
         if not deal:
             return Response({'error': 'Not found'}, status=404)
 
-        allowed = ['stage', 'velocity', 'notes', 'customer_name',
+        allowed = ['velocity', 'notes', 'customer_name',
                    'customer_phone', 'estimated_value', 'mpesa_reference',
                    'expected_close_date']
         for field in allowed:
@@ -202,103 +190,32 @@ class PipelineDealDetailView(APIView):
 
 
 class PipelineDealActionView(APIView):
-    """
-    POST /api/v1/pipeline/deals/<id>/action/
-
-    Primary action — directly mark Won or Lost.
-    Middle stages still available via /advance/ endpoint.
-
-    If log_sale=true and action=won, creates a Sale record inline.
-    """
-    permission_classes = [IsAuthenticated, IsClientOrAdmin]
+    """POST /api/v1/pipeline/deals/<id>/action/ — retired; stages are no longer manually changed."""
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, deal_id):
-        try:
-            deal = PipelineDeal.objects.get(
-                id=deal_id, tenant=get_tenant(request)
-            )
-        except PipelineDeal.DoesNotExist:
-            return Response(
-                {'error': True, 'message': 'Deal not found.'}, status=404
-            )
-
-        serializer = WonLostSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        action = data['action']
-
-        if action == 'won':
-            deal.mark_won(notes=data.get('notes', ''))
-        else:
-            deal.mark_lost(
-                reason=data.get('lost_reason', ''),
-                notes=data.get('notes', '')
-            )
-
-        # Log transition
-        StageTransitionLog.objects.create(
-            deal=deal,
-            from_stage=deal.stage,
-            to_stage=action,
-            transitioned_by=request.user,
-            source='manual',
-            notes=data.get('notes', ''),
-        )
-
-        # Fire webhooks
-        from apps.external_api.tasks import dispatch_webhook
-        dispatch_webhook.delay(
-            str(get_tenant(request).id),
-            f'pipeline.{action}',
-            {'deal_id': str(deal.id), 'platform': deal.platform}
-        )
-
-        response_data = PipelineDealSerializer(deal).data
-        response_data['action_taken'] = action
-
-        if action == 'won':
-            response_data['message'] = (
-                'Deal marked as Won! The sale will sync automatically once '
-                'this deal is marked Won in Kommo too.'
-            )
-
-        return Response(response_data)
+        return Response({
+            'error': True,
+            'message': (
+                'Manually marking deals Won/Lost has been retired. Pipeline '
+                'stages are no longer tracked — a deal syncs as a Sale '
+                'automatically once it\'s marked Won in Kommo.'
+            ),
+        }, status=status.HTTP_410_GONE)
 
 
 class PipelineDealAdvanceView(APIView):
-    """
-    POST /api/v1/pipeline/deals/<id>/advance/
-    Optional: move through middle stages (Contacted → Interested → Negotiating).
-    """
-    permission_classes = [IsAuthenticated, IsClientOrAdmin]
+    """POST /api/v1/pipeline/deals/<id>/advance/ — retired; stages are no longer manually changed."""
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, deal_id):
-        try:
-            deal = PipelineDeal.objects.get(id=deal_id, tenant=get_tenant(request))
-        except PipelineDeal.DoesNotExist:
-            return Response({'error': True, 'message': 'Deal not found.'}, status=404)
-
-        new_stage = request.data.get('stage')
-        notes = request.data.get('notes', '')
-
-        if not new_stage:
-            return Response(
-                {'error': True, 'message': 'stage is required.'}, status=400
-            )
-
-        old_stage = deal.stage
-        deal.advance_to_stage(new_stage, notes=notes)
-
-        StageTransitionLog.objects.create(
-            deal=deal,
-            from_stage=old_stage,
-            to_stage=new_stage,
-            transitioned_by=request.user,
-            source='manual',
-            notes=notes,
-        )
-
-        return Response(PipelineDealSerializer(deal).data)
+        return Response({
+            'error': True,
+            'message': (
+                'Manually advancing pipeline stages has been retired. '
+                'Kommo owns the real pipeline now.'
+            ),
+        }, status=status.HTTP_410_GONE)
 
 
 class PipelineSummaryView(APIView):
