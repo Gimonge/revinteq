@@ -17,7 +17,14 @@ import uuid
 
 
 class KommoConnection(models.Model):
-    """One Kommo account connection per tenant."""
+    """
+    One Kommo account connection per tenant, using a Long-lived Token —
+    Kommo's recommended approach for private, single-account integrations
+    like this one. No OAuth exchange, no refresh_token, no redirect URI.
+    The client generates the token themselves (Settings -> Integrations
+    -> their integration -> Keys and scopes -> Generate long-lived token)
+    and pastes it in directly.
+    """
 
     id     = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tenant = models.OneToOneField(
@@ -29,14 +36,13 @@ class KommoConnection(models.Model):
         help_text="e.g. clientname.kommo.com — the tenant's own Kommo account"
     )
 
-    # Each tenant registers their own integration inside their own Kommo
-    # account, so these are per-tenant (not a shared Gimsc-wide app).
-    client_id     = models.CharField(max_length=200, blank=True, default='')
-    client_secret = encrypt(models.CharField(max_length=500, blank=True, default=''))
-
-    access_token      = encrypt(models.TextField())
-    refresh_token      = encrypt(models.TextField())
-    token_expires_at  = models.DateTimeField(null=True, blank=True)
+    # The long-lived token itself (a JWT). No refresh_token exists for
+    # this token type — when it expires, the tenant generates a new one.
+    access_token = encrypt(models.TextField())
+    token_expires_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Optional — set if the tenant tells us the expiry they chose (1 day to 5 years)"
+    )
 
     sync_enabled = models.BooleanField(default=True)
     connected_at = models.DateTimeField(auto_now_add=True)

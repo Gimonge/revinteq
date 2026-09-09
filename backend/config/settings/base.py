@@ -196,14 +196,11 @@ META_GRAPH_API_VERSION = 'v20.0'
 META_GRAPH_BASE_URL    = f'https://graph.facebook.com/{META_GRAPH_API_VERSION}'
 
 # ── Kommo CRM integration ───────────────────────────────────────
-# Each tenant registers their OWN integration inside their OWN Kommo
-# account and pastes their Integration ID, Secret Key, and a one-time
-# Authorization Code into Revinteq (see apps.kommo_integration) — no
-# shared Gimsc-wide credentials and no redirect flow. The redirect_uri
-# below is never actually visited; Kommo's token-exchange endpoint just
-# requires it to match what the client entered when creating their
-# integration, so every client is told to set theirs to this same value.
-KOMMO_FIXED_REDIRECT_URI = config('KOMMO_FIXED_REDIRECT_URI', default='https://api.revinteq.com/api/v1/kommo/callback/')
+# Each tenant generates their own Long-lived Token inside their own
+# Kommo account (Settings -> Integrations -> Keys and scopes -> Generate
+# long-lived token) — Kommo's own recommended approach for a private,
+# single-account integration. No OAuth exchange, no redirect URI, no
+# shared Gimsc-wide credentials (see apps.kommo_integration).
 KOMMO_MATCH_WINDOW_MINUTES = 20
 KOMMO_MATCH_MAX_RETRIES    = 5
 

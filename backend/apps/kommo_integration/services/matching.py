@@ -18,7 +18,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 
-from .kommo_api import KommoAPIClient, KommoOAuthService, KommoAPIError
+from .kommo_api import KommoAPIClient, KommoAPIError
 
 logger = logging.getLogger(__name__)
 
@@ -27,26 +27,6 @@ LOST_STATUS_ID = 143
 
 MATCH_WINDOW_MINUTES = getattr(settings, 'KOMMO_MATCH_WINDOW_MINUTES', 20)
 MAX_MATCH_ATTEMPTS   = getattr(settings, 'KOMMO_MATCH_MAX_RETRIES', 5)
-
-
-def refresh_connection_token(connection):
-    """Refresh an expired KommoConnection's access token in place."""
-    try:
-        data = KommoOAuthService.refresh_access_token(
-            connection.subdomain, connection.refresh_token,
-            connection.client_id, connection.client_secret,
-        )
-        connection.access_token     = data['access_token']
-        connection.refresh_token    = data['refresh_token']
-        connection.token_expires_at = KommoOAuthService.compute_token_expiry(data.get('expires_in', 86400))
-        connection.last_error       = ''
-        connection.save(update_fields=['access_token', 'refresh_token', 'token_expires_at', 'last_error'])
-        logger.info(f"Kommo token refreshed for {connection.tenant.name}")
-    except KommoAPIError as e:
-        connection.last_error = str(e)
-        connection.save(update_fields=['last_error'])
-        logger.error(f"Kommo token refresh failed for {connection.tenant.name}: {e}")
-        raise
 
 
 def attempt_match(matched_lead) -> bool:

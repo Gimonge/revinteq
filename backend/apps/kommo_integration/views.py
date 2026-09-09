@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.common.views import get_tenant
 from .models import KommoConnection
-from .services.kommo_api import KommoOAuthService, KommoAPIError
+from .services.kommo_api import KommoAPIClient, KommoAPIError
 
 logger = logging.getLogger(__name__)
 
@@ -14,13 +14,14 @@ logger = logging.getLogger(__name__)
 class KommoConnectManualView(APIView):
     """
     POST /api/v1/kommo/connect/
-    Body: { subdomain, client_id, client_secret, auth_code }
+    Body: { subdomain, long_lived_token }
 
-    Each tenant registers their own integration inside their own Kommo
-    account and pastes the Integration ID, Secret Key, and the
-    ready-made Authorization Code Kommo shows them in that same modal
-    (no redirect needed). We exchange that code immediately — it
-    expires in 20 minutes — and store the resulting tokens.
+    Each tenant generates their own Long-lived Token inside their own
+    Kommo account (Settings -> Integrations -> their integration -> Keys
+    and scopes -> Generate long-lived token) — Kommo's recommended
+    approach for a private, single-account integration like this one.
+    No OAuth exchange, no redirect, no client secret involved. We verify
+    the token actually works before saving it.
     """
     permission_classes = [IsAuthenticated]
 
@@ -29,13 +30,10 @@ class KommoConnectManualView(APIView):
         if not tenant:
             return Response({'error': True, 'message': 'No tenant for this account.'}, status=400)
 
-        subdomain     = (request.data.get('subdomain') or '').strip()
-        client_id     = (request.data.get('client_id') or '').strip()
-        client_secret = (request.data.get('client_secret') or '').strip()
-        auth_code     = (request.data.get('auth_code') or '').strip()
+        subdomain = (request.data.get('subdomain') or '').strip()
+        token     = (request.data.get('long_lived_token') or '').strip()
 
-        missing = [f for f, v in [('subdomain', subdomain), ('client_id', client_id),
-                                    ('client_secret', client_secret), ('auth_code', auth_code)] if not v]
+        missing = [f for f, v in [('subdomain', subdomain), ('long_lived_token', token)] if not v]
         if missing:
             return Response({'error': True, 'message': f"Missing: {', '.join(missing)}"}, status=400)
 
@@ -43,27 +41,20 @@ class KommoConnectManualView(APIView):
         if subdomain.startswith('http'):
             subdomain = subdomain.split('//', 1)[-1].rstrip('/')
 
+        client = KommoAPIClient(subdomain, token)
         try:
-            token_data = KommoOAuthService.exchange_code_for_token(
-                subdomain, auth_code, client_id, client_secret
-            )
+            client.verify_token()
         except KommoAPIError as e:
             logger.warning(f"Kommo connect failed for {tenant.name}: {e}")
-            return Response({'error': True, 'message': str(e)}, status=400)
-
-        expiry = KommoOAuthService.compute_token_expiry(token_data.get('expires_in', 86400))
+            return Response({'error': True, 'message': f"Couldn't verify token: {e}"}, status=400)
 
         KommoConnection.objects.update_or_create(
             tenant=tenant,
             defaults={
-                'subdomain':        subdomain,
-                'client_id':        client_id,
-                'client_secret':    client_secret,
-                'access_token':     token_data['access_token'],
-                'refresh_token':    token_data['refresh_token'],
-                'token_expires_at': expiry,
-                'sync_enabled':     True,
-                'last_error':       '',
+                'subdomain':    subdomain,
+                'access_token': token,
+                'sync_enabled': True,
+                'last_error':   '',
             }
         )
         logger.info(f"Kommo connected for {tenant.name} ({subdomain})")

@@ -79,16 +79,12 @@
         </div>
         <div v-if="showKommoForm && !kommo.connected" style="padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg)">
           <p style="font-size:12.5px;color:var(--slate-mid);font-weight:600;line-height:1.6;margin-bottom:14px">
-            In your own Kommo account, go to <strong>Settings → Integrations → Create Integration</strong>. Set the Redirect URI to
-            <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-size:11.5px">https://api.revinteq.com/api/v1/kommo/callback/</code>
-            (it won't actually be visited — Kommo just requires it to match). Save it, and on the integration's page you'll see an
-            <strong>Integration ID</strong>, <strong>Secret Key</strong>, and an <strong>Authorization Code</strong> — copy all three here.
-            The code expires in 20 minutes, so paste it in fairly quickly.
+            In your own Kommo account, go to <strong>Settings → Integrations → Create Integration</strong> (no Redirect URI needed).
+            Save it, open it, go to the <strong>Keys and scopes</strong> tab, click <strong>Generate long-lived token</strong>,
+            pick an expiry (up to 5 years), and copy the token — Kommo only shows it once, so paste it here right away.
           </p>
           <div class="rv-fg"><label class="rv-fl">Your Kommo Subdomain</label><input v-model="kommoForm.subdomain" class="rv-fi" placeholder="yourbusiness.kommo.com"></div>
-          <div class="rv-fg"><label class="rv-fl">Integration ID</label><input v-model="kommoForm.client_id" class="rv-fi"></div>
-          <div class="rv-fg"><label class="rv-fl">Secret Key</label><input v-model="kommoForm.client_secret" type="password" class="rv-fi"></div>
-          <div class="rv-fg"><label class="rv-fl">Authorization Code</label><input v-model="kommoForm.auth_code" class="rv-fi"></div>
+          <div class="rv-fg"><label class="rv-fl">Long-lived Token</label><textarea v-model="kommoForm.long_lived_token" class="rv-ft" style="min-height:70px;font-family:monospace;font-size:11.5px" placeholder="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."></textarea></div>
           <button class="rv-btn rv-btn-p rv-btn-sm" @click="connectKommo" :disabled="kommoConnecting">
             <span v-if="kommoConnecting" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
             <span v-else><i class="ti ti-plug" aria-hidden="true"></i> Connect Kommo</span>
@@ -117,7 +113,7 @@ const fbStatus    = computed(() => fbConnected.value ? 'Read-only access' : 'Not
 const kommo = ref({ connected:false, subdomain:'', last_synced:null, last_error:'' })
 const kommoConnecting = ref(false), kommoSyncing = ref(false)
 const showKommoForm = ref(false)
-const kommoForm = ref({ subdomain:'', client_id:'', client_secret:'', auth_code:'' })
+const kommoForm = ref({ subdomain:'', long_lived_token:'' })
 const kommoStatusText = computed(() => {
   if (!kommo.value.connected) return 'Sales tracked here become your revenue'
   return kommo.value.subdomain + (kommo.value.last_error ? ' — sync issue, check connection' : '')
@@ -132,7 +128,7 @@ async function connectKommo() {
     const r = await api.post('/kommo/connect/', kommoForm.value)
     kommo.value = { connected:true, subdomain:r.data.subdomain, last_synced:null, last_error:'' }
     showKommoForm.value = false
-    kommoForm.value = { subdomain:'', client_id:'', client_secret:'', auth_code:'' }
+    kommoForm.value = { subdomain:'', long_lived_token:'' }
     emit('toast','Kommo connected successfully!','green')
   } catch(e) {
     emit('toast', e.response?.data?.message || 'Failed to connect Kommo', 'red')
