@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/v1/auth/',             include('apps.accounts.urls')),
     path('api/v1/tenants/',          include('apps.tenants.urls')),
     path('api/v1/meta/',             include('apps.meta_integration.urls')),
+    path('api/v1/kommo/',            include('apps.kommo_integration.urls')),
     path('api/v1/crm/',              include('apps.crm.urls')),
     path('api/v1/whatsapp/',         include('apps.whatsapp_tracking.urls')),
     path('api/v1/sales/',            include('apps.sales.urls')),

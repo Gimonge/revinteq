@@ -58,6 +58,42 @@
           </div>
           <span class="rv-badge" :class="form.whatsapp_number?'rv-bg':'rv-bgy'"><i v-if="form.whatsapp_number" class="ti ti-check" aria-hidden="true"></i> {{ form.whatsapp_number?'Active':'Not configured' }}</span>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:38px;height:38px;border-radius:var(--r-md);background:var(--purple-light);display:flex;align-items:center;justify-content:center;font-size:20px"><i class="ti ti-layout-kanban" aria-hidden="true"></i></div>
+            <div><div style="font-size:14px;font-weight:800">Kommo CRM</div><div style="font-size:12px;color:var(--slate-light);font-weight:600;margin-top:1px">{{ kommoStatusText }}</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button v-if="!kommo.connected" class="rv-btn rv-btn-p rv-btn-sm" @click="showKommoForm = !showKommoForm">
+              <i class="ti ti-plug" aria-hidden="true"></i> Connect
+            </button>
+            <template v-else>
+              <button class="rv-btn rv-btn-s rv-btn-sm" @click="syncKommo" :disabled="kommoSyncing">
+                <span v-if="kommoSyncing" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
+                <span v-else><i class="ti ti-refresh" aria-hidden="true"></i> Sync Now</span>
+              </button>
+              <button class="rv-btn rv-btn-d rv-btn-sm" @click="disconnectKommo"><i class="ti ti-plug-off" aria-hidden="true"></i></button>
+              <span class="rv-badge rv-bg"><i class="ti ti-check" aria-hidden="true"></i> Connected</span>
+            </template>
+          </div>
+        </div>
+        <div v-if="showKommoForm && !kommo.connected" style="padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg)">
+          <p style="font-size:12.5px;color:var(--slate-mid);font-weight:600;line-height:1.6;margin-bottom:14px">
+            In your own Kommo account, go to <strong>Settings → Integrations → Create Integration</strong>. Set the Redirect URI to
+            <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-size:11.5px">https://api.revinteq.com/api/v1/kommo/callback/</code>
+            (it won't actually be visited — Kommo just requires it to match). Save it, and on the integration's page you'll see an
+            <strong>Integration ID</strong>, <strong>Secret Key</strong>, and an <strong>Authorization Code</strong> — copy all three here.
+            The code expires in 20 minutes, so paste it in fairly quickly.
+          </p>
+          <div class="rv-fg"><label class="rv-fl">Your Kommo Subdomain</label><input v-model="kommoForm.subdomain" class="rv-fi" placeholder="yourbusiness.kommo.com"></div>
+          <div class="rv-fg"><label class="rv-fl">Integration ID</label><input v-model="kommoForm.client_id" class="rv-fi"></div>
+          <div class="rv-fg"><label class="rv-fl">Secret Key</label><input v-model="kommoForm.client_secret" type="password" class="rv-fi"></div>
+          <div class="rv-fg"><label class="rv-fl">Authorization Code</label><input v-model="kommoForm.auth_code" class="rv-fi"></div>
+          <button class="rv-btn rv-btn-p rv-btn-sm" @click="connectKommo" :disabled="kommoConnecting">
+            <span v-if="kommoConnecting" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
+            <span v-else><i class="ti ti-plug" aria-hidden="true"></i> Connect Kommo</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -78,6 +114,42 @@ const fbConnected = computed(() => auth.tenant?.meta_fb_connected)
 const igConnected = computed(() => auth.tenant?.meta_ig_connected)
 const fbStatus    = computed(() => fbConnected.value ? 'Read-only access' : 'Not connected')
 
+const kommo = ref({ connected:false, subdomain:'', last_synced:null, last_error:'' })
+const kommoConnecting = ref(false), kommoSyncing = ref(false)
+const showKommoForm = ref(false)
+const kommoForm = ref({ subdomain:'', client_id:'', client_secret:'', auth_code:'' })
+const kommoStatusText = computed(() => {
+  if (!kommo.value.connected) return 'Sales tracked here become your revenue'
+  return kommo.value.subdomain + (kommo.value.last_error ? ' — sync issue, check connection' : '')
+})
+
+async function fetchKommoStatus() {
+  try { const r = await api.get('/kommo/status/'); kommo.value = r.data } catch(e) {}
+}
+async function connectKommo() {
+  kommoConnecting.value = true
+  try {
+    const r = await api.post('/kommo/connect/', kommoForm.value)
+    kommo.value = { connected:true, subdomain:r.data.subdomain, last_synced:null, last_error:'' }
+    showKommoForm.value = false
+    kommoForm.value = { subdomain:'', client_id:'', client_secret:'', auth_code:'' }
+    emit('toast','Kommo connected successfully!','green')
+  } catch(e) {
+    emit('toast', e.response?.data?.message || 'Failed to connect Kommo', 'red')
+  }
+  kommoConnecting.value = false
+}
+async function syncKommo() {
+  kommoSyncing.value = true
+  try { await api.post('/kommo/sync/'); emit('toast','Kommo sync started','green') }
+  catch(e) { emit('toast','Failed to start sync','red') }
+  kommoSyncing.value = false
+}
+async function disconnectKommo() {
+  try { await api.post('/kommo/disconnect/'); kommo.value = { connected:false, subdomain:'', last_synced:null, last_error:'' }; emit('toast','Kommo disconnected','green') }
+  catch(e) { emit('toast','Failed to disconnect','red') }
+}
+
 onMounted(() => {
   if (auth.tenant) {
     form.value.name = auth.tenant.name || ''
@@ -86,6 +158,7 @@ onMounted(() => {
     form.value.currency = auth.tenant.currency || 'KES'
     capVal.value = auth.tenant.budget_increase_cap_percent || 20
   }
+  fetchKommoStatus()
 })
 async function saveProfile() {
   saving.value = true; saved.value = false

@@ -88,6 +88,29 @@ def _is_duplicate(phone: str, meta_ad_id: str, tenant_id: str, window_days: int 
         return False
 
 
+# ── Kommo matching hook ────────────────────────────────────────────────────────
+
+def _start_kommo_match(deal):
+    """
+    If this tenant has Kommo connected, create a pending match record and
+    dispatch the async matching task (delayed, so Kommo's own independent
+    webhook has a head start creating its lead for the same click).
+    """
+    try:
+        if not hasattr(deal.tenant, 'kommo_connection') or not deal.tenant.kommo_connection.sync_enabled:
+            return
+        from apps.kommo_integration.models import KommoMatchedLead
+        from apps.kommo_integration.tasks import match_pipeline_deal_to_kommo
+
+        matched_lead, _ = KommoMatchedLead.objects.get_or_create(
+            pipeline_deal=deal,
+            defaults={'tenant': deal.tenant},
+        )
+        match_pipeline_deal_to_kommo.apply_async(args=[str(matched_lead.id)], countdown=30)
+    except Exception as e:
+        logger.warning(f"Could not start Kommo match for deal {deal.id}: {e}")
+
+
 # ── WhatsApp Webhook ──────────────────────────────────────────────────────────
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
@@ -227,6 +250,11 @@ def _handle_whatsapp_ad_click(
         f"Platform={platform} | Velocity={velocity.upper()} | "
         f"Phone={sender_phone} | Deal={deal.id}"
     )
+
+    # 8b. Kick off Kommo lead matching (Kommo receives the same ad click
+    # independently and creates its own lead — we look it up so a later
+    # "won" status there can be attributed back to this ad/campaign)
+    _start_kommo_match(deal)
 
     # 9. Fire external webhook
     try:
@@ -428,6 +456,10 @@ def _handle_channel_click(
         f"✅ {channel.title()} deal | Tenant={tenant.name} | "
         f"Ad={ad.name} | Velocity={velocity.upper()} | Deal={deal.id}"
     )
+
+    # Kick off Kommo lead matching (best-effort — no phone/name captured
+    # for Messenger/Instagram, so this matches by nearest-in-time instead)
+    _start_kommo_match(deal)
 
     try:
         from apps.external_api.tasks import dispatch_webhook

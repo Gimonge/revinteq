@@ -32,7 +32,7 @@ class Recommendation(models.Model):
     tenant   = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='recommendations')
     rule_id  = models.CharField(max_length=10, choices=RULE_CHOICES)
     title    = models.CharField(max_length=300)
-    message  = models.TextField()
+    message  = models.TextField(default='')
     body     = models.TextField(default='')  # legacy alias for message
     action   = models.CharField(max_length=30, choices=ACTION_CHOICES, default='INFORMATIONAL')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='INFO')
