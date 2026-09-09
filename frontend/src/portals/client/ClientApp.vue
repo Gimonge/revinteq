@@ -34,7 +34,6 @@
         <Analytics    v-if="page==='analytics'"  @nav="navigate" @toast="showToast" />
         <Pipeline     v-if="page==='pipeline'"   @nav="navigate" @toast="showToast" />
         <SalesHistory v-if="page==='history'"    @nav="navigate" @toast="showToast" />
-        <BulkUpload   v-if="page==='bulk'"        @nav="navigate" @toast="showToast" />
         <FacebookAds  v-if="page==='facebook'"   @nav="navigate" @toast="showToast" />
         <InstagramAds v-if="page==='instagram'"  @nav="navigate" @toast="showToast" />
         <RevenueGoals v-if="page==='goals'"       @nav="navigate" @toast="showToast" />
@@ -56,7 +55,6 @@ import Dashboard    from './pages/Dashboard.vue'
 import Analytics    from './pages/Analytics.vue'
 import Pipeline     from './pages/Pipeline.vue'
 import SalesHistory from './pages/SalesHistory.vue'
-import BulkUpload   from './pages/BulkUpload.vue'
 import FacebookAds  from './pages/FacebookAds.vue'
 import InstagramAds from './pages/InstagramAds.vue'
 import RevenueGoals from './pages/RevenueGoals.vue'
@@ -72,7 +70,6 @@ let toastTimer
 
 const PAGE_TITLES = {
   dashboard:'Dashboard', analytics:'Analytics', pipeline:'Sales Pipeline',
-  log:'Log a Sale', history:'Sales History', bulk:'Bulk Upload',
   facebook:'Facebook Ads', instagram:'Instagram Ads',
   goals:'Revenue Goals', sms:'SMS', customers:'Customers', settings:'Settings',
 }

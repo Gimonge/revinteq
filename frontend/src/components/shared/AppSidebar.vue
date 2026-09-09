@@ -17,7 +17,6 @@
 
     <div class="rv-sb-section">Sales</div>
     <div class="rv-nav-item" :class="{active:page==='history'}" @click="nav('history')"><span class="rv-nav-icon"><i class="ti ti-clipboard-list" aria-hidden="true"></i></span>Sales History</div>
-    <div class="rv-nav-item" :class="{active:page==='bulk'}"    @click="nav('bulk')"><span class="rv-nav-icon"><i class="ti ti-upload" aria-hidden="true"></i></span>Bulk Upload</div>
 
     <div class="rv-sb-section">Ads</div>
     <div class="rv-nav-item" :class="{active:page==='facebook'}"  @click="nav('facebook')"><span class="rv-nav-icon"><i class="ti ti-brand-facebook" aria-hidden="true"></i></span>Facebook Ads</div>

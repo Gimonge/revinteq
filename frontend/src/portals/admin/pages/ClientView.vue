@@ -19,7 +19,6 @@
     <Customers     v-if="activeTab==='customers'"  />
     <RevenueGoals  v-if="activeTab==='goals'"      />
     <SMS           v-if="activeTab==='sms'"        />
-    <BulkUpload    v-if="activeTab==='bulk'"       />
     <Settings      v-if="activeTab==='settings'"  />
   </div>
 </template>
@@ -32,7 +31,6 @@ import SalesHistory from '@/portals/client/pages/SalesHistory.vue'
 import Customers    from '@/portals/client/pages/Customers.vue'
 import RevenueGoals from '@/portals/client/pages/RevenueGoals.vue'
 import SMS          from '@/portals/client/pages/SMS.vue'
-import BulkUpload   from '@/portals/client/pages/BulkUpload.vue'
 import Settings     from '@/portals/client/pages/Settings.vue'
 
 defineProps(['tenant'])
@@ -47,7 +45,6 @@ const tabs = [
   { key: 'customers',  icon: 'ti-users',           label: 'Customers' },
   { key: 'goals',      icon: 'ti-target',          label: 'Revenue Goals' },
   { key: 'sms',        icon: 'ti-device-mobile',   label: 'SMS' },
-  { key: 'bulk',       icon: 'ti-upload',          label: 'Bulk Upload' },
   { key: 'settings',   icon: 'ti-settings',        label: 'Settings' },
 ]
 </script>

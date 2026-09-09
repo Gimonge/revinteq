@@ -27,6 +27,11 @@
       {{ fmtMoney(deal.estimated_value) }}
     </div>
 
+    <!-- Synced sale from Kommo -->
+    <div v-if="deal.has_sale" class="inline-flex items-center gap-1 text-[10px] font-black text-green bg-green-light rounded-full px-2 py-0.5 mb-2">
+      <i class="ti ti-circle-check" aria-hidden="true"></i> Synced Sale
+    </div>
+
     <!-- ══ M-PESA BILL REFERENCE ══════════════════════════ -->
     <div
       v-if="deal.mpesa_reference && isOpen"

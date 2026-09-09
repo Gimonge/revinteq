@@ -11,7 +11,6 @@ const Dashboard     = () => import('@/portals/client/pages/Dashboard.vue')
 const Analytics     = () => import('@/portals/client/pages/Analytics.vue')
 const Pipeline      = () => import('@/portals/client/pages/Pipeline.vue')
 const SalesHistory  = () => import('@/portals/client/pages/SalesHistory.vue')
-const BulkUpload    = () => import('@/portals/client/pages/BulkUpload.vue')
 const FacebookAds   = () => import('@/portals/client/pages/FacebookAds.vue')
 const InstagramAds  = () => import('@/portals/client/pages/InstagramAds.vue')
 const RevenueGoals  = () => import('@/portals/client/pages/RevenueGoals.vue')
@@ -38,7 +37,6 @@ const routes = [
   { path: '/analytics',     name: 'analytics',    component: Analytics,    meta: { role: 'client' } },
   { path: '/pipeline',      name: 'pipeline',     component: Pipeline,     meta: { role: 'client' } },
   { path: '/sales',         name: 'sales',        component: SalesHistory, meta: { role: 'client' } },
-  { path: '/bulk-upload',   name: 'bulk-upload',  component: BulkUpload,   meta: { role: 'client' } },
   { path: '/facebook-ads',  name: 'facebook-ads', component: FacebookAds,  meta: { role: 'client' } },
   { path: '/instagram-ads', name: 'instagram-ads',component: InstagramAds, meta: { role: 'client' } },
   { path: '/goals',         name: 'goals',        component: RevenueGoals, meta: { role: 'client' } },

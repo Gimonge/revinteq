@@ -107,6 +107,10 @@
               <div style="font-size:10px;font-weight:700;color:var(--slate-mid)">Total</div>
             </div>
           </div>
+          <div style="margin-top:10px;text-align:center;padding:10px;background:var(--green-light);border-radius:var(--r-md)">
+            <div style="font-size:18px;font-weight:900;color:var(--green)"><i class="ti ti-circle-check" aria-hidden="true"></i> {{ waClicks.synced_to_sale }}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--green)">Synced to a sale via Kommo</div>
+          </div>
         </div>
       </div>
     </div>
@@ -192,7 +196,7 @@ const metrics = ref({ total_revenue:0, total_spend:0, roi:0, roas:0, cpa:0, cpl:
 const dailyRevenue = ref([])
 const coldDeals = ref(0)
 const flashing  = ref(false)
-const waClicks  = ref({ total:0, whatsapp:0, messenger:0, instagram:0 })
+const waClicks  = ref({ total:0, whatsapp:0, messenger:0, instagram:0, synced_to_sale:0 })
 const adSpend   = ref({
   facebook:  { spend:0, impressions:0, clicks:0, dm_conversations:0 },
   instagram: { spend:0, impressions:0, clicks:0, dm_conversations:0 },
@@ -232,7 +236,7 @@ function fmtK(v, cur) {
 async function loadWaClicks() {
   try {
     const r = await api.get('/whatsapp/stats/')
-    waClicks.value = r.data || { total:0, whatsapp:0, messenger:0, instagram:0 }
+    waClicks.value = r.data || { total:0, whatsapp:0, messenger:0, instagram:0, synced_to_sale:0 }
   } catch(e) {}
 }
 
