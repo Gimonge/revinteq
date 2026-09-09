@@ -9,7 +9,7 @@
     <div v-if="currentGoal" class="rv-gps card-reveal" :class="gpsClass">
       <div>
         <div class="rv-gps-lbl">Revenue GPS — {{ monthLabel }}</div>
-        <div class="rv-gps-status">{{ gpsIcon }} {{ gpsTitle }}</div>
+        <div class="rv-gps-status"><i :class="['ti', gpsIcon]" aria-hidden="true"></i> {{ gpsTitle }}</div>
         <div class="rv-gps-sub">Target: {{ fmtK(currentGoal.target_amount) }} &bull; Achieved: {{ fmtK(achieved) }}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
@@ -17,7 +17,7 @@
         <div class="rv-gps-pct-lbl">Goal progress</div>
       </div>
     </div>
-    <div v-else class="rv-al rv-al-b card-reveal">💡 No goal set for this month. Click "Set Goal" to activate the Revenue GPS tracker.</div>
+    <div v-else class="rv-al rv-al-b card-reveal"><i class="ti ti-bulb" aria-hidden="true"></i> No goal set for this month. Click "Set Goal" to activate the Revenue GPS tracker.</div>
 
     <!-- Goals table -->
     <div class="rv-card card-reveal" style="animation-delay:.1s">
@@ -42,8 +42,8 @@
               <td><span class="rv-badge" :class="goalBadge(g)">{{ goalStatus(g) }}</span></td>
               <td @click.stop>
                 <div style="display:flex;gap:4px">
-                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openEditGoal(g)">✏️</button>
-                  <button class="rv-btn rv-btn-d rv-btn-xs" @click="deleteGoal(g)">🗑️</button>
+                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openEditGoal(g)"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+                  <button class="rv-btn rv-btn-d rv-btn-xs" @click="deleteGoal(g)"><i class="ti ti-trash" aria-hidden="true"></i></button>
                 </div>
               </td>
             </tr>
@@ -80,7 +80,7 @@
     <div class="rv-card" style="width:100%;max-width:400px">
       <div class="rv-ch">
         <div class="rv-ct">Edit Goal — {{ editForm.month }}</div>
-        <button @click="editGoal=null" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--slate-light)">✕</button>
+        <button @click="editGoal=null" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--slate-light)"><i class="ti ti-x" aria-hidden="true"></i></button>
       </div>
       <div class="rv-cb" style="display:flex;flex-direction:column;gap:12px">
         <div class="rv-fg" style="margin:0">
@@ -90,7 +90,7 @@
         <div style="display:flex;gap:8px">
           <button class="rv-btn rv-btn-p" @click="saveGoal" :disabled="savingGoal">
             <span v-if="savingGoal" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-            <span v-else>💾 Save</span>
+            <span v-else><i class="ti ti-device-floppy" aria-hidden="true"></i> Save</span>
           </button>
           <button class="rv-btn rv-btn-s" @click="editGoal=null">Cancel</button>
         </div>
@@ -118,7 +118,7 @@ const monthLabel = computed(() => dayjs().format('MMMM YYYY'))
 const currentGoal = computed(() => goals.value.find(g => g.month?.startsWith(dayjs().format('YYYY-MM'))))
 const pct = computed(() => currentGoal.value ? Math.round((achieved.value/currentGoal.value.target_amount)*100) : 0)
 const gpsClass = computed(() => pct.value>=100?'ahead':pct.value>=60?'on_track':pct.value>0?'behind':'no_goal')
-const gpsIcon  = computed(() => ({ahead:'🚀',on_track:'✅',behind:'⚠️',no_goal:'📍'})[gpsClass.value])
+const gpsIcon  = computed(() => ({ahead:'ti-rocket',on_track:'ti-circle-check',behind:'ti-alert-triangle',no_goal:'ti-map-pin'})[gpsClass.value])
 const gpsTitle = computed(() => ({ahead:'Ahead of Goal',on_track:'On Track',behind:'Behind Goal',no_goal:'No Goal'})[gpsClass.value])
 
 function fmtK(v, cur) {

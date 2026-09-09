@@ -93,7 +93,7 @@
           </div>
           <div v-if="createdKey" class="rv-al rv-al-g" style="margin-top:14px">
             <div>
-              <div style="font-weight:900;margin-bottom:6px">✅ Key created — copy it now, it won't be shown again</div>
+              <div style="font-weight:900;margin-bottom:6px"><i class="ti ti-circle-check" aria-hidden="true"></i> Key created — copy it now, it won't be shown again</div>
               <div class="rv-api-key">{{ createdKey }}</div>
             </div>
           </div>

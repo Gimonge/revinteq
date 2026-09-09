@@ -8,21 +8,21 @@
     <!-- Step 1: Upload -->
     <div v-if="step==='upload'" class="rv-card card-reveal">
       <div class="rv-ch"><span class="rv-ct">Upload Excel File</span>
-        <button class="rv-btn rv-btn-s rv-btn-sm" @click="downloadTemplate">⬇ Download Template</button>
+        <button class="rv-btn rv-btn-s rv-btn-sm" @click="downloadTemplate"><i class="ti ti-arrow-down" aria-hidden="true"></i> Download Template</button>
       </div>
       <div class="rv-cb">
-        <div class="rv-al rv-al-b" style="margin-bottom:16px">📋 Download the template above, fill in your sales data, then upload it here. Maximum 5MB, .xlsx format.</div>
+        <div class="rv-al rv-al-b" style="margin-bottom:16px"><i class="ti ti-clipboard-list" aria-hidden="true"></i> Download the template above, fill in your sales data, then upload it here. Maximum 5MB, .xlsx format.</div>
         <div class="rv-upload-zone" @click="$refs.fileInput.click()" @dragover.prevent @drop.prevent="onDrop">
-          <div style="font-size:40px;margin-bottom:12px">📤</div>
+          <div style="font-size:40px;margin-bottom:12px"><i class="ti ti-upload" aria-hidden="true"></i></div>
           <div style="font-size:15px;font-weight:800;color:var(--slate);margin-bottom:6px">Click to select file or drag and drop</div>
           <div style="font-size:13px;color:var(--slate-light);font-weight:600">.xlsx files only &bull; Max 5MB</div>
-          <div v-if="selectedFile" style="margin-top:12px;font-size:13px;font-weight:800;color:var(--green)">✅ {{ selectedFile.name }}</div>
+          <div v-if="selectedFile" style="margin-top:12px;font-size:13px;font-weight:800;color:var(--green)"><i class="ti ti-circle-check" aria-hidden="true"></i> {{ selectedFile.name }}</div>
         </div>
         <input ref="fileInput" type="file" accept=".xlsx,.xls" style="display:none" @change="onFileSelect">
         <div v-if="uploadError" class="rv-al rv-al-r" style="margin-top:12px">{{ uploadError }}</div>
         <button v-if="selectedFile" class="rv-btn rv-btn-p" style="margin-top:14px" @click="uploadFile" :disabled="uploading">
           <span v-if="uploading" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-          <span v-else>📤 Preview Upload</span>
+          <span v-else><i class="ti ti-upload" aria-hidden="true"></i> Preview Upload</span>
         </button>
       </div>
     </div>
@@ -39,10 +39,10 @@
         <div class="rv-ch">
           <span class="rv-ct">Preview</span>
           <div style="display:flex;gap:8px">
-            <button class="rv-btn rv-btn-s rv-btn-sm" @click="step='upload';selectedFile=null">← Re-upload</button>
+            <button class="rv-btn rv-btn-s rv-btn-sm" @click="step='upload';selectedFile=null"><i class="ti ti-arrow-left" aria-hidden="true"></i> Re-upload</button>
             <button class="rv-btn rv-btn-p rv-btn-sm" @click="confirmUpload" :disabled="confirming||preview.valid_rows===0">
               <span v-if="confirming" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-              <span v-else>✅ Confirm &amp; Save {{ preview.valid_rows }} Sales</span>
+              <span v-else><i class="ti ti-circle-check" aria-hidden="true"></i> Confirm &amp; Save {{ preview.valid_rows }} Sales</span>
             </button>
           </div>
         </div>
@@ -63,8 +63,8 @@
                 <td>{{ row.data?.platform_source || '—' }}</td>
                 <td>{{ row.data?.sale_date || '—' }}</td>
                 <td>
-                  <span v-if="row.status==='valid'" class="rv-badge rv-bg">✓ Valid</span>
-                  <span v-else class="rv-badge rv-br" :title="row.errors.join(', ')">✗ Error</span>
+                  <span v-if="row.status==='valid'" class="rv-badge rv-bg"><i class="ti ti-check" aria-hidden="true"></i> Valid</span>
+                  <span v-else class="rv-badge rv-br" :title="row.errors.join(', ')"><i class="ti ti-x" aria-hidden="true"></i> Error</span>
                 </td>
               </tr>
             </tbody>
@@ -76,7 +76,7 @@
     <!-- Step 3: Done -->
     <div v-if="step==='done'" class="rv-card card-reveal">
       <div class="rv-cb" style="text-align:center;padding:48px 20px">
-        <div style="font-size:48px;margin-bottom:16px">✅</div>
+        <div style="font-size:48px;margin-bottom:16px"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
         <div style="font-size:20px;font-weight:900;margin-bottom:8px">Upload Complete!</div>
         <div style="font-size:14px;color:var(--slate-mid);font-weight:600;margin-bottom:24px">{{ result.saved_rows }} sales saved successfully. Total: {{ fmtK(result.total_amount) }}</div>
         <button class="rv-btn rv-btn-p" @click="reset">Upload Another File</button>

@@ -4,7 +4,7 @@
     <div class="flex items-center gap-3">
       <!-- Impersonation banner -->
       <div v-if="auth.isImpersonating" class="flex items-center gap-2 bg-amber text-white text-xs font-black px-3.5 py-1.5 rounded-full">
-        <span>👁️ Viewing as: <strong>{{ auth.tenantName }}</strong></span>
+        <span><i class="ti ti-eye" aria-hidden="true"></i> Viewing as: <strong>{{ auth.tenantName }}</strong></span>
         <button @click="stopImpersonate" class="bg-white/25 hover:bg-white/40 rounded-full px-2 py-0.5 transition-colors">Exit</button>
       </div>
       <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black bg-green-light text-green">

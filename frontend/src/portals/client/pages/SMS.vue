@@ -2,10 +2,10 @@
   <div style="display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;align-items:flex-start;justify-content:space-between" class="fade-up">
       <div><div style="font-size:21px;font-weight:900;letter-spacing:-.4px">SMS</div><div style="font-size:13px;color:var(--slate-light);font-weight:600;margin-top:3px">Send messages via Africa's Talking</div></div>
-      <button class="rv-btn rv-btn-p rv-btn-sm" @click="showCompose=true">✉️ New Message</button>
+      <button class="rv-btn rv-btn-p rv-btn-sm" @click="showCompose=true"><i class="ti ti-mail" aria-hidden="true"></i> New Message</button>
     </div>
 
-    <div v-if="!smsConfigured" class="rv-al rv-al-a card-reveal">⚠️ SMS is not configured for your account. Contact your Gimsc admin to set up Africa's Talking credentials.</div>
+    <div v-if="!smsConfigured" class="rv-al rv-al-a card-reveal"><i class="ti ti-alert-triangle" aria-hidden="true"></i> SMS is not configured for your account. Contact your Gimsc admin to set up Africa's Talking credentials.</div>
 
     <div v-else>
       <!-- Stats -->
@@ -55,7 +55,7 @@
           <button class="rv-btn rv-btn-s" @click="showCompose=false">Cancel</button>
           <button class="rv-btn rv-btn-p" @click="sendSMS" :disabled="sending">
             <span v-if="sending" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-            <span v-else>📱 Send</span>
+            <span v-else><i class="ti ti-device-mobile" aria-hidden="true"></i> Send</span>
           </button>
         </div>
       </div>

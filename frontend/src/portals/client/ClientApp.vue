@@ -26,7 +26,7 @@
         <div class="rv-topbar-title">{{ pageTitle }}</div>
         <div class="rv-topbar-right">
           <span class="rv-badge rv-bg">{{ auth.tenant?.currency || 'KES' }}</span>
-          <button class="rv-btn rv-btn-s rv-btn-sm" @click="handleLogout">🚪 Logout</button>
+          <button class="rv-btn rv-btn-s rv-btn-sm" @click="handleLogout"><i class="ti ti-logout" aria-hidden="true"></i> Logout</button>
         </div>
       </div>
       <div class="rv-scroll">
@@ -44,7 +44,7 @@
         <Settings     v-if="page==='settings'"   @nav="navigate" @toast="showToast" />
       </div>
     </div>
-    <div v-if="toast.show" class="rv-toast" :class="toast.type">{{ toast.icon }} {{ toast.msg }}</div>
+    <div v-if="toast.show" class="rv-toast" :class="toast.type"><i :class="['ti', toast.icon]" aria-hidden="true"></i> {{ toast.msg }}</div>
   </div>
 </template>
 
@@ -69,7 +69,7 @@ import Settings     from './pages/Settings.vue'
 const auth        = useAuthStore()
 const page        = ref('dashboard')
 const sidebarOpen = ref(false)
-const toast       = ref({ show:false, msg:'', type:'green', icon:'✅' })
+const toast       = ref({ show:false, msg:'', type:'green', icon:'ti-circle-check' })
 let toastTimer
 
 const PAGE_TITLES = {
@@ -92,7 +92,7 @@ function onLoginSuccess() {
 
 function showToast(msg, type='green') {
   clearTimeout(toastTimer)
-  toast.value = { show:true, msg, type, icon: type==='green'?'✅':type==='red'?'❌':'ℹ️' }
+  toast.value = { show:true, msg, type, icon: type==='green'?'ti-circle-check':type==='red'?'ti-circle-x':'ti-info-circle' }
   toastTimer = setTimeout(() => { toast.value.show = false }, 3200)
 }
 </script>

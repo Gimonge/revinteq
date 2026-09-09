@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900;1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,7 +18,7 @@
   --shadow-green:0 4px 14px rgba(31,122,76,.35);
   --shadow-blue:0 4px 14px rgba(37,99,235,.25);
   --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:18px;
-  --font:'Nunito',sans-serif;
+  --font:'Inter',sans-serif;
   --sidebar-w:252px; --topbar-h:58px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}

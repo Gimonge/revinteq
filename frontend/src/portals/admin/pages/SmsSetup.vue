@@ -38,7 +38,7 @@
                 <span v-else class="rv-badge rv-bgy">Not configured</span>
               </td>
               <td>
-                <button class="rv-btn rv-btn-s rv-btn-xs" @click="$emit('open-client', t)">Configure →</button>
+                <button class="rv-btn rv-btn-s rv-btn-xs" @click="$emit('open-client', t)">Configure <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
               </td>
             </tr>
             <tr v-if="tenants.length===0">

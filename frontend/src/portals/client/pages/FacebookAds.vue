@@ -8,24 +8,24 @@
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <button class="rv-btn rv-btn-s rv-btn-sm" @click="syncNow(true)" :disabled="syncing">
           <span v-if="syncing" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-          <span v-else>↻ Force Sync</span>
+          <span v-else><i class="ti ti-refresh" aria-hidden="true"></i> Force Sync</span>
         </button>
         <button v-if="!fbConnected" class="rv-btn rv-btn-p rv-btn-sm" @click="connectFacebook" :disabled="connecting">
           <span v-if="connecting" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-          <span v-else>📘 Connect Facebook</span>
+          <span v-else><i class="ti ti-brand-facebook" aria-hidden="true"></i> Connect Facebook</span>
         </button>
-        <button v-else class="rv-btn rv-btn-s rv-btn-sm" disabled style="opacity:.6;cursor:default;color:var(--green)">✅ Facebook Connected</button>
+        <button v-else class="rv-btn rv-btn-s rv-btn-sm" disabled style="opacity:.6;cursor:default;color:var(--green)"><i class="ti ti-circle-check" aria-hidden="true"></i> Facebook Connected</button>
       </div>
     </div>
     <div v-if="syncMsg" class="rv-al rv-al-g" style="margin:0">{{ syncMsg }}</div>
     <div v-if="!fbConnected" class="rv-card card-reveal">
       <div class="rv-cb" style="text-align:center;padding:48px 20px">
-        <div style="font-size:48px;margin-bottom:16px">📘</div>
+        <div style="font-size:48px;margin-bottom:16px"><i class="ti ti-brand-facebook" aria-hidden="true"></i></div>
         <div style="font-size:18px;font-weight:900;margin-bottom:8px">Connect your Facebook Ads account</div>
         <div style="font-size:14px;color:var(--slate-mid);font-weight:600;margin-bottom:24px">See your campaign performance, ad spend, and ROI all in one place.</div>
         <button class="rv-btn rv-btn-p" @click="connectFacebook" :disabled="connecting">
           <span v-if="connecting" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-          <span v-else>📘 Connect Facebook</span>
+          <span v-else><i class="ti ti-brand-facebook" aria-hidden="true"></i> Connect Facebook</span>
         </button>
       </div>
     </div>
@@ -65,7 +65,7 @@
               <option v-for="obj in uniqueObjectives" :key="obj" :value="obj">{{ obj }}</option>
             </select>
             <input v-model="searchQuery" class="rv-fi" placeholder="Search campaigns..." style="font-size:12px;padding:5px 10px;min-width:180px;flex:1">
-            <button v-if="hasFilters" class="rv-btn rv-btn-s rv-btn-xs" @click="clearFilters">✕ Clear</button>
+            <button v-if="hasFilters" class="rv-btn rv-btn-s rv-btn-xs" @click="clearFilters"><i class="ti ti-x" aria-hidden="true"></i> Clear</button>
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@
       <div class="rv-card" style="width:100%;max-width:500px;max-height:80vh;overflow-y:auto">
         <div class="rv-ch">
           <div><div class="rv-ct">Select Your Ad Account</div><div class="rv-cst">Choose which Facebook Ad Account to connect</div></div>
-          <button @click="showAccountSelect=false" style="background:none;border:none;font-size:20px;cursor:pointer">✕</button>
+          <button @click="showAccountSelect=false" style="background:none;border:none;font-size:20px;cursor:pointer"><i class="ti ti-x" aria-hidden="true"></i></button>
         </div>
         <div class="rv-cb">
           <div v-if="loadingAccounts" style="text-align:center;padding:32px"><span class="rv-spin"></span></div>
@@ -188,7 +188,7 @@
             <div style="display:flex;gap:8px;margin-top:16px">
               <button class="rv-btn rv-btn-p" @click="confirmAccountSelection" :disabled="!pendingAccount||savingAccount">
                 <span v-if="savingAccount" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-                <span v-else>✅ Connect This Account</span>
+                <span v-else><i class="ti ti-circle-check" aria-hidden="true"></i> Connect This Account</span>
               </button>
               <button class="rv-btn rv-btn-s" @click="showAccountSelect=false">Cancel</button>
             </div>
@@ -328,7 +328,7 @@ async function confirmAccountSelection() {
   try {
     await api.post('/meta/select-account/',{account_id:pendingAccount.value.id})
     showAccountSelect.value=false;await auth.fetchUser()
-    emit('toast',`✅ Facebook Ads connected — ${pendingAccount.value.name}`,'green')
+    emit('toast',`Facebook Ads connected — ${pendingAccount.value.name}`,'green')
     await loadAdAccounts();await loadCampaigns()
   } catch(e){emit('toast','Failed to connect account','red')}
   savingAccount.value=false
@@ -343,7 +343,7 @@ onMounted(async () => {
     try { const r=await api.get('/meta/select-account/');availableAccounts.value=r.data.ad_accounts||[];if(availableAccounts.value.length===1) pendingAccount.value=availableAccounts.value[0] } catch(e){emit('toast','Failed to load ad accounts','red');showAccountSelect.value=false}
     loadingAccounts.value=false
   }
-  if (params.get('meta_connected')==='1') { window.history.replaceState({},'',window.location.pathname);await auth.fetchUser();emit('toast','✅ Facebook connected successfully!','green') }
+  if (params.get('meta_connected')==='1') { window.history.replaceState({},'',window.location.pathname);await auth.fetchUser();emit('toast','Facebook connected successfully!','green') }
   if (params.get('meta_error')) { emit('toast',`Facebook error: ${decodeURIComponent(params.get('meta_error'))}`,'red');window.history.replaceState({},'',window.location.pathname) }
   await loadAdAccounts()
   await loadCampaigns()

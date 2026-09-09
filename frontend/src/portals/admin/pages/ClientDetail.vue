@@ -6,8 +6,8 @@
         <div class="rv-page-sub">{{ tenant?.location || '' }}{{ tenant?.industry ? ' &bull; ' + tenant.industry : '' }}</div>
       </div>
       <div style="display:flex;gap:10px">
-        <button v-if="tenant?.status==='active'" class="rv-btn rv-btn-a" @click="$emit('impersonate',tenant)">👁️ View as Client</button>
-        <button class="rv-btn rv-btn-s" @click="$emit('nav','clients')">← Back</button>
+        <button v-if="tenant?.status==='active'" class="rv-btn rv-btn-a" @click="$emit('impersonate',tenant)"><i class="ti ti-eye" aria-hidden="true"></i> View as Client</button>
+        <button class="rv-btn rv-btn-s" @click="$emit('nav','clients')"><i class="ti ti-arrow-left" aria-hidden="true"></i> Back</button>
       </div>
     </div>
 
@@ -16,7 +16,7 @@
       <div class="rv-card card-reveal">
         <div class="rv-ch">
           <div class="rv-ct">Business Info</div>
-          <button class="rv-btn rv-btn-s rv-btn-sm" @click="editMode=!editMode">✏️ {{ editMode?'Cancel':'Edit' }}</button>
+          <button class="rv-btn rv-btn-s rv-btn-sm" @click="editMode=!editMode"><i class="ti ti-pencil" aria-hidden="true"></i> {{ editMode?'Cancel':'Edit' }}</button>
         </div>
         <div class="rv-cb">
           <div v-if="!editMode">
@@ -28,26 +28,26 @@
               <tr><td>Email</td><td>{{ tenant?.contact_email || '—' }}</td></tr>
               <tr><td>Phone</td><td>{{ tenant?.contact_phone || '—' }}</td></tr>
               <tr><td>Budget Cap</td><td>{{ tenant?.budget_increase_cap_percent || 20 }}%</td></tr>
-              <tr><td>Facebook</td><td><span :style="{color:tenant?.meta_fb_connected?'var(--green)':'var(--red)',fontWeight:800}">{{ tenant?.meta_fb_connected?'✓ Connected':'✗ Not connected' }}</span></td></tr>
-              <tr><td>Instagram</td><td><span :style="{color:tenant?.meta_ig_connected?'var(--green)':'var(--red)',fontWeight:800}">{{ tenant?.meta_ig_connected?'✓ Connected':'✗ Not connected' }}</span></td></tr>
+              <tr><td>Facebook</td><td><span :style="{color:tenant?.meta_fb_connected?'var(--green)':'var(--red)',fontWeight:800}"><i :class="['ti', tenant?.meta_fb_connected?'ti-check':'ti-x']" aria-hidden="true"></i> {{ tenant?.meta_fb_connected?'Connected':'Not connected' }}</span></td></tr>
+              <tr><td>Instagram</td><td><span :style="{color:tenant?.meta_ig_connected?'var(--green)':'var(--red)',fontWeight:800}"><i :class="['ti', tenant?.meta_ig_connected?'ti-check':'ti-x']" aria-hidden="true"></i> {{ tenant?.meta_ig_connected?'Connected':'Not connected' }}</span></td></tr>
             </tbody></table>
 
             <!-- Archive / Restore -->
             <div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
               <button v-if="tenant?.status==='active'" class="rv-btn rv-btn-d rv-btn-sm" @click="archiveClient" :disabled="archiving">
                 <span v-if="archiving" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-                <span v-else>🗃️ Archive Client</span>
+                <span v-else><i class="ti ti-archive" aria-hidden="true"></i> Archive Client</span>
               </button>
               <button v-else class="rv-btn rv-btn-p rv-btn-sm" @click="restoreClient" :disabled="archiving">
                 <span v-if="archiving" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-                <span v-else>✅ Restore to Active</span>
+                <span v-else><i class="ti ti-circle-check" aria-hidden="true"></i> Restore to Active</span>
               </button>
               <span v-if="tenant?.status==='inactive'" class="rv-badge rv-bgy">Archived — data preserved</span>
             </div>
 
             <!-- Ad Account Assignment -->
             <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
-              <div style="font-size:11px;font-weight:900;color:var(--slate-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">📊 Assigned Ad Accounts</div>
+              <div style="font-size:11px;font-weight:900;color:var(--slate-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px"><i class="ti ti-chart-bar" aria-hidden="true"></i> Assigned Ad Accounts</div>
               <div v-if="loadingAdAccounts" style="color:var(--slate-light);font-size:12px">Loading...</div>
               <div v-else>
                 <div v-if="!assignedAccounts.length" style="font-size:12px;color:var(--slate-light);margin-bottom:8px">No ad accounts assigned yet.</div>
@@ -70,7 +70,7 @@
                   </select>
                   <button class="rv-btn rv-btn-p rv-btn-xs" @click="assignAccount" :disabled="!accountToAssign||assigningAccount">
                     <span v-if="assigningAccount" class="rv-spin" style="width:10px;height:10px;border-width:2px"></span>
-                    <span v-else>➕ Assign Ad Account</span>
+                    <span v-else><i class="ti ti-plus" aria-hidden="true"></i> Assign Ad Account</span>
                   </button>
                 </div>
               </div>
@@ -94,7 +94,7 @@
               <div class="rv-fg"><label class="rv-fl">Location</label><input v-model="editForm.location" class="rv-fi"></div>
             </div>
             <div style="display:flex;gap:10px">
-              <button class="rv-btn rv-btn-p" @click="saveEdit">💾 Save Changes</button>
+              <button class="rv-btn rv-btn-p" @click="saveEdit"><i class="ti ti-device-floppy" aria-hidden="true"></i> Save Changes</button>
               <button class="rv-btn rv-btn-s" @click="editMode=false">Cancel</button>
             </div>
           </div>
@@ -114,9 +114,9 @@
           </div>
           <button class="rv-btn rv-btn-p" @click="sendInvite" :disabled="inviting">
             <span v-if="inviting" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-            <span v-else>📧 Send Invitation</span>
+            <span v-else><i class="ti ti-mail" aria-hidden="true"></i> Send Invitation</span>
           </button>
-          <div v-if="inviteSuccess" class="rv-al rv-al-g" style="margin-top:12px">✅ Invitation sent to {{ inviteEmail }}</div>
+          <div v-if="inviteSuccess" class="rv-al rv-al-g" style="margin-top:12px"><i class="ti ti-circle-check" aria-hidden="true"></i> Invitation sent to {{ inviteEmail }}</div>
           <div class="rv-divider" style="margin:16px 0"></div>
           <div class="rv-sec-lbl">Existing Members</div>
           <div v-for="m in members" :key="m.id" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
@@ -132,7 +132,7 @@
     <div class="rv-g2">
       <!-- M-Pesa Config -->
       <div class="rv-card card-reveal" style="animation-delay:.12s">
-        <div class="rv-ch"><div><div class="rv-ct">💚 M-Pesa Configuration</div><div class="rv-cst">Daraja API credentials (encrypted at rest)</div></div></div>
+        <div class="rv-ch"><div><div class="rv-ct"><i class="ti ti-heart" aria-hidden="true"></i> M-Pesa Configuration</div><div class="rv-cst">Daraja API credentials (encrypted at rest)</div></div></div>
         <div class="rv-cb">
           <div class="rv-fg"><label class="rv-fl">Environment</label>
             <select v-model="mpesa.environment" class="rv-fs"><option value="sandbox">Sandbox (testing)</option><option value="production">Production (live)</option></select>
@@ -148,24 +148,24 @@
           <div class="rv-fg"><label class="rv-fl">Passkey</label><input v-model="mpesa.passkey" class="rv-fi" type="password"></div>
           <button class="rv-btn rv-btn-p" @click="saveMpesa" :disabled="savingMpesa">
             <span v-if="savingMpesa" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-            <span v-else>💾 Save &amp; Register URLs</span>
+            <span v-else><i class="ti ti-device-floppy" aria-hidden="true"></i> Save &amp; Register URLs</span>
           </button>
-          <div v-if="mpesaSuccess" class="rv-al rv-al-g" style="margin-top:12px">✅ M-Pesa config saved!</div>
+          <div v-if="mpesaSuccess" class="rv-al rv-al-g" style="margin-top:12px"><i class="ti ti-circle-check" aria-hidden="true"></i> M-Pesa config saved!</div>
         </div>
       </div>
 
       <!-- SMS Config -->
       <div class="rv-card card-reveal" style="animation-delay:.16s">
-        <div class="rv-ch"><div><div class="rv-ct">📱 SMS Configuration</div><div class="rv-cst">Africa's Talking credentials (encrypted)</div></div></div>
+        <div class="rv-ch"><div><div class="rv-ct"><i class="ti ti-device-mobile" aria-hidden="true"></i> SMS Configuration</div><div class="rv-cst">Africa's Talking credentials (encrypted)</div></div></div>
         <div class="rv-cb">
           <div class="rv-fg"><label class="rv-fl">AT Username</label><input v-model="sms.username" class="rv-fi"></div>
           <div class="rv-fg"><label class="rv-fl">API Key</label><input v-model="sms.api_key" class="rv-fi" type="password"></div>
           <div class="rv-fg"><label class="rv-fl">Sender ID (optional)</label><input v-model="sms.sender_id" class="rv-fi"></div>
           <button class="rv-btn rv-btn-p" @click="saveSms" :disabled="savingSms">
             <span v-if="savingSms" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-            <span v-else>💾 Save SMS Config</span>
+            <span v-else><i class="ti ti-device-floppy" aria-hidden="true"></i> Save SMS Config</span>
           </button>
-          <div v-if="smsSuccess" class="rv-al rv-al-g" style="margin-top:12px">✅ SMS config saved!</div>
+          <div v-if="smsSuccess" class="rv-al rv-al-g" style="margin-top:12px"><i class="ti ti-circle-check" aria-hidden="true"></i> SMS config saved!</div>
         </div>
       </div>
     </div>
@@ -236,7 +236,7 @@ async function assignAccount() {
     await api.post(`/meta/admin/accounts/${accountToAssign.value}/assign/`, { tenant_id: props.tenant.id })
     await loadAdAccounts()
     accountToAssign.value = ''
-    emit('toast', 'Ad account assigned ✓', 'green')
+    emit('toast', 'Ad account assigned <i class="ti ti-check" aria-hidden="true"></i>', 'green')
   } catch(e) { emit('toast', 'Failed to assign', 'red') }
   assigningAccount.value = false
 }

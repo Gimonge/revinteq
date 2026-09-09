@@ -34,7 +34,7 @@
               class="rv-fs"
               style="font-size:12px;padding:6px 10px;min-width:180px;cursor:pointer"
             >
-              <option value="">👤 Switch Client Account</option>
+              <option value="">Switch Client Account</option>
               <option v-for="t in tenants" :key="t.id" :value="t.id">
                 {{ t.name }} ({{ t.status }})
               </option>
@@ -43,15 +43,15 @@
 
           <!-- Impersonation banner -->
           <div v-if="impersonating" style="display:flex;align-items:center;gap:8px;background:var(--amber);color:#000;padding:6px 12px;border-radius:var(--r-md);font-size:12px;font-weight:700">
-            👁️ Acting as: <strong>{{ impersonateName }}</strong>
+            <i class="ti ti-eye" aria-hidden="true"></i> Acting as: <strong>{{ impersonateName }}</strong>
             <button
               @click="stopImpersonate"
               style="background:#000;color:#fff;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px;font-weight:700"
-            >✕ Exit</button>
+            ><i class="ti ti-x" aria-hidden="true"></i> Exit</button>
           </div>
 
           <span style="font-size:13px;font-weight:700;color:var(--slate-mid)">{{ auth.user?.email }}</span>
-          <button class="rv-btn rv-btn-s rv-btn-sm" @click="handleLogout">🚪 Logout</button>
+          <button class="rv-btn rv-btn-s rv-btn-sm" @click="handleLogout"><i class="ti ti-logout" aria-hidden="true"></i> Logout</button>
         </div>
       </div>
 
@@ -77,7 +77,7 @@
         />
       </div>
     </div>
-    <div v-if="toast.show" class="rv-toast" :class="toast.type">{{ toast.icon }} {{ toast.msg }}</div>
+    <div v-if="toast.show" class="rv-toast" :class="toast.type"><i :class="['ti', toast.icon]" aria-hidden="true"></i> {{ toast.msg }}</div>
   </div>
 </template>
 
@@ -109,7 +109,7 @@ const impersonating   = ref(false)
 const impersonateName = ref('')
 const impersonateTenant = ref(null)
 const sidebarOpen = ref(false)
-const toast = ref({ show:false, msg:'', type:'green', icon:'✅' })
+const toast = ref({ show:false, msg:'', type:'green', icon:'ti-circle-check' })
 let toastTimer
 
 const isAdminUser = computed(() =>
@@ -183,7 +183,7 @@ function onLoginSuccess() { loadCounts() }
 
 function showToast(msg, type='green') {
   clearTimeout(toastTimer)
-  toast.value = { show:true, msg, type, icon: type==='green'?'✅':type==='red'?'❌':'ℹ️' }
+  toast.value = { show:true, msg, type, icon: type==='green'?'ti-circle-check':type==='red'?'ti-circle-x':'ti-info-circle' }
   toastTimer = setTimeout(() => { toast.value.show = false }, 4000)
 }
 

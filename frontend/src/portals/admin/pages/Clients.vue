@@ -5,17 +5,17 @@
         <div class="rv-page-title">All Clients</div>
         <div class="rv-page-sub">Manage all tenant accounts</div>
       </div>
-      <button class="rv-btn rv-btn-p" @click="$emit('nav','add-client')">➕ Add New Client</button>
+      <button class="rv-btn rv-btn-p" @click="$emit('nav','add-client')"><i class="ti ti-plus" aria-hidden="true"></i> Add New Client</button>
     </div>
 
     <div class="rv-card card-reveal">
       <div class="rv-ch">
         <div class="rv-ct">Clients</div>
-        <input v-model="search" class="rv-fi" placeholder="🔍  Search clients..." style="width:220px;padding:7px 12px;font-size:12.5px">
+        <input v-model="search" class="rv-fi" placeholder="Search clients..." style="width:220px;padding:7px 12px;font-size:12.5px">
       </div>
       <div v-if="loading" style="padding:40px;text-align:center"><span class="rv-spin"></span></div>
       <div v-else-if="filtered.length===0" class="rv-empty">
-        <div class="rv-empty-icon">🏢</div>
+        <div class="rv-empty-icon"><i class="ti ti-building" aria-hidden="true"></i></div>
         <div class="rv-empty-title">No clients found</div>
         <div class="rv-empty-sub">{{ search ? 'Try a different search term' : 'Add your first client to get started' }}</div>
       </div>
@@ -36,7 +36,7 @@
               </div>
               <span style="font-size:10.5px;font-weight:800;white-space:nowrap"
                 :style="{color:goalColor(t.goal_status)}">
-                {{ t.goal_progress||0 }}% — {{ goalLabel(t.goal_status) }}
+                {{ t.goal_progress||0 }}% — <i :class="['ti', goalIcon(t.goal_status)]" aria-hidden="true"></i> {{ goalLabel(t.goal_status) }}
               </span>
               <span style="font-size:10.5px;color:var(--slate-light);font-weight:600;white-space:nowrap">
                 {{ fmt(t.monthly_revenue||0) }} / {{ fmt(t.monthly_goal) }}
@@ -48,8 +48,8 @@
           </div>
           <div class="rv-tenant-actions">
             <span class="rv-badge" :class="statusBadge(t.status)">{{ t.status }}</span>
-            <button v-if="t.status!=='suspended'" class="rv-btn rv-btn-a rv-btn-xs" @click="$emit('impersonate',t)">👁️ View as client</button>
-            <button class="rv-btn rv-btn-s rv-btn-xs" @click="$emit('open-client',t)">Open →</button>
+            <button v-if="t.status!=='suspended'" class="rv-btn rv-btn-a rv-btn-xs" @click="$emit('impersonate',t)"><i class="ti ti-eye" aria-hidden="true"></i> View as client</button>
+            <button class="rv-btn rv-btn-s rv-btn-xs" @click="$emit('open-client',t)">Open <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
           </div>
         </div>
       </div>
@@ -79,7 +79,8 @@ const GRADS = [
 function gradientFor(name) { return GRADS[name.charCodeAt(0) % GRADS.length] }
 function statusBadge(s) { return {'active':'rv-bg','trial':'rv-bb','suspended':'rv-ba','inactive':'rv-bgy'}[s]||'rv-bgy' }
 function goalBadge(s)   { return {'ahead':'rv-bg','on_track':'rv-bb','behind':'rv-ba','no_goal':'rv-bgy'}[s]||'rv-bgy' }
-function goalLabel(s)   { return {'ahead':'🚀 Ahead','on_track':'✅ On Track','behind':'⚠️ Behind','no_goal':'No Goal'}[s]||'—' }
+function goalIcon(s)    { return {'ahead':'ti-rocket','on_track':'ti-circle-check','behind':'ti-alert-triangle','no_goal':'ti-map-pin'}[s]||'' }
+function goalLabel(s)   { return {'ahead':'Ahead','on_track':'On Track','behind':'Behind','no_goal':'No Goal'}[s]||'—' }
 function goalColor(s)   { return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)'}[s]||'var(--slate-light)' }
 function goalBarColor(s){ return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)','no_goal':'var(--border-mid)'}[s]||'var(--border-mid)' }
 function fmt(v) { return _fmtK(v) }

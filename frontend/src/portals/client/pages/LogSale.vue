@@ -10,12 +10,12 @@
       <div class="rv-cb">
 
         <div v-if="success" class="rv-al rv-al-g" style="margin-bottom:16px">
-          ✅ Sale logged! {{ successMsg }}
+          <i class="ti ti-circle-check" aria-hidden="true"></i> Sale logged! {{ successMsg }}
         </div>
         <div v-if="error" class="rv-al rv-al-r" style="margin-bottom:16px">{{ error }}</div>
 
         <!-- Customer info -->
-        <div class="rv-sec-lbl">👤 Customer (Optional)</div>
+        <div class="rv-sec-lbl"><i class="ti ti-user" aria-hidden="true"></i> Customer (Optional)</div>
         <div class="rv-g2">
           <div class="rv-fg">
             <label class="rv-fl">Customer Name</label>
@@ -28,7 +28,7 @@
         </div>
 
         <!-- Sale details -->
-        <div class="rv-sec-lbl">🛍️ Sale Details</div>
+        <div class="rv-sec-lbl"><i class="ti ti-shopping-bag" aria-hidden="true"></i> Sale Details</div>
         <div class="rv-fg">
           <label class="rv-fl">Product / Service *</label>
           <input v-model="form.product_name" class="rv-fi" placeholder="e.g. Blue Summer Dress (Size M)">
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Payment -->
-        <div class="rv-sec-lbl">💳 Payment</div>
+        <div class="rv-sec-lbl"><i class="ti ti-credit-card" aria-hidden="true"></i> Payment</div>
         <div class="rv-g2">
           <div class="rv-fg">
             <label class="rv-fl">Payment Method *</label>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Attribution -->
-        <div class="rv-sec-lbl">📊 Attribution</div>
+        <div class="rv-sec-lbl"><i class="ti ti-chart-bar" aria-hidden="true"></i> Attribution</div>
         <div class="rv-g2">
           <div class="rv-fg">
             <label class="rv-fl">Platform Source</label>
@@ -109,7 +109,7 @@
         <div style="display:flex;gap:10px;margin-top:8px">
           <button class="rv-btn rv-btn-p" @click="logSale" :disabled="saving">
             <span v-if="saving" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-            <span v-else>💾 Log Sale</span>
+            <span v-else><i class="ti ti-device-floppy" aria-hidden="true"></i> Log Sale</span>
           </button>
           <button class="rv-btn rv-btn-s" @click="clearForm">Clear</button>
         </div>

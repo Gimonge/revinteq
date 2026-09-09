@@ -178,7 +178,7 @@ const totals = computed(() => {
 })
 
 function goalBadge(s)   { return {'ahead':'rv-bg','on_track':'rv-bb','behind':'rv-ba','no_goal':'rv-bgy'}[s]||'rv-bgy' }
-function goalLabel(s)   { return {'ahead':'🚀 Ahead','on_track':'✅ On Track','behind':'⚠️ Behind','no_goal':'No Goal'}[s]||'—' }
+function goalLabel(s)   { return {'ahead':'Ahead','on_track':'On Track','behind':'Behind','no_goal':'No Goal'}[s]||'—' }
 function goalColor(s)   { return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)'}[s]||'var(--slate-light)' }
 function goalBarColor(s){ return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)','no_goal':'var(--border-mid)'}[s]||'var(--border-mid)' }
 function fmt(v) { return _fmtK(v) }

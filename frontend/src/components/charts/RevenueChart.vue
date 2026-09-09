@@ -30,7 +30,7 @@ const chartOptions = computed(() => ({
   chart: {
     toolbar:    { show: false },
     animations: { enabled: true, speed: 600 },
-    fontFamily: 'Nunito, sans-serif',
+    fontFamily: 'Inter, sans-serif',
   },
   plotOptions: {
     bar: {

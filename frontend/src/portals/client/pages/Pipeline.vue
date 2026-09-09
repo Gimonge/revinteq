@@ -33,22 +33,22 @@
           @click="openDeal(deal)">
           <div class="rv-d-name">{{ deal.customer_name || 'Anonymous' }}</div>
           <div class="rv-d-meta" :style="deal.platform==='instagram'?igStyle:''">
-            {{ platformIcon(deal.platform) }} {{ deal.platform==='instagram'?'Instagram':'Facebook' }}
+            <i :class="['ti', platformIcon(deal.platform)]" aria-hidden="true"></i> {{ deal.platform==='instagram'?'Instagram':'Facebook' }}
             <span v-if="deal.campaign_name"> &bull; {{ deal.campaign_name }}</span>
           </div>
           <div class="rv-d-meta" style="margin-top:2px">
             <span v-if="deal.estimated_value"><strong style="color:var(--slate)">{{ fmtK(deal.estimated_value) }}</strong> &bull; </span>
             {{ timeAgo(deal.created_at) }}
           </div>
-          <div v-if="deal.mpesa_reference" class="rv-d-meta" style="margin-top:3px;color:var(--green);font-weight:800;font-size:10.5px">🔖 {{ deal.mpesa_reference }}</div>
-          <div class="rv-d-vel" :class="velClass(deal.velocity)">{{ velIcon(deal.velocity) }} {{ deal.velocity }}</div>
+          <div v-if="deal.mpesa_reference" class="rv-d-meta" style="margin-top:3px;color:var(--green);font-weight:800;font-size:10.5px"><i class="ti ti-bookmark" aria-hidden="true"></i> {{ deal.mpesa_reference }}</div>
+          <div class="rv-d-vel" :class="velClass(deal.velocity)"><i :class="['ti', velIcon(deal.velocity)]" :style="{color: velColor(deal.velocity)}" aria-hidden="true"></i> {{ deal.velocity }}</div>
           <div style="display:flex;gap:5px;margin-top:8px" v-if="!['won','lost'].includes(deal.stage)">
-            <button class="rv-btn rv-btn-p rv-btn-xs" @click.stop="markWon(deal)" style="font-size:10px;padding:3px 8px">✅ Won</button>
-            <button class="rv-btn rv-btn-d rv-btn-xs" @click.stop="markLost(deal)" style="font-size:10px;padding:3px 8px">✗ Lost</button>
+            <button class="rv-btn rv-btn-p rv-btn-xs" @click.stop="markWon(deal)" style="font-size:10px;padding:3px 8px"><i class="ti ti-circle-check" aria-hidden="true"></i> Won</button>
+            <button class="rv-btn rv-btn-d rv-btn-xs" @click.stop="markLost(deal)" style="font-size:10px;padding:3px 8px"><i class="ti ti-x" aria-hidden="true"></i> Lost</button>
           </div>
         </div>
         <div v-if="col.deals.length>3" class="rv-col-foot">{{ col.deals.length-3 }} more deals</div>
-        <div v-if="col.stage==='won' && col.deals.length>0" class="rv-col-foot" style="cursor:pointer;color:var(--green)" @click="$emit('nav','history')">View all {{ col.deals.length }} →</div>
+        <div v-if="col.stage==='won' && col.deals.length>0" class="rv-col-foot" style="cursor:pointer;color:var(--green)" @click="$emit('nav','history')">View all {{ col.deals.length }} <i class="ti ti-arrow-right" aria-hidden="true"></i></div>
       </div>
     </div>
 
@@ -123,9 +123,10 @@ const summary  = computed(() => ({
 }))
 
 const igStyle = 'background:linear-gradient(135deg,var(--ig1),var(--ig3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800'
-function platformIcon(p) { return p==='instagram'?'📸':'📘' }
+function platformIcon(p) { return p==='instagram'?'ti-brand-instagram':'ti-brand-facebook' }
 function velClass(v) { return v==='hot'?'vel-hot':v==='warm'?'vel-warm':'vel-cold' }
-function velIcon(v)  { return v==='hot'?'🔥 Hot':v==='warm'?'🟡 Warm':'❄️ Cold' }
+function velIcon(v)  { return v==='hot'?'ti-flame':v==='warm'?'ti-circle-filled':'ti-snowflake' }
+function velColor(v) { return v==='warm'?'#d97706':v==='hot'?'#dc2626':'#2563eb' }
 function timeAgo(dt) { return dt ? dayjs(dt).fromNow() : '' }
 function fmtK(v, cur) {
   return _fmtK(v, cur || auth.tenant?.currency || 'KES')

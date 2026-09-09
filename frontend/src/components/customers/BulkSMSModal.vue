@@ -14,13 +14,13 @@
               <textarea v-model="message" maxlength="160" rows="4" class="rv-input" placeholder="Hi {name}, this is a message from Amari Boutique..."></textarea>
             </div>
             <div class="rv-alert rv-alert-blue text-[12px]">
-              📌 Only customers with SMS opt-in enabled will receive this message.
+              <i class="ti ti-pin" aria-hidden="true"></i> Only customers with SMS opt-in enabled will receive this message.
             </div>
           </div>
           <div class="px-6 py-4 border-t border-border flex gap-3 justify-end">
             <button @click="$emit('close')" class="rv-btn-secondary">Cancel</button>
             <button @click="send" :disabled="loading || !message" class="rv-btn-primary">
-              <span v-if="loading" class="rv-spinner mr-2"></span>📤 Send Bulk SMS
+              <span v-if="loading" class="rv-spinner mr-2"></span><i class="ti ti-upload" aria-hidden="true"></i> Send Bulk SMS
             </button>
           </div>
         </div>

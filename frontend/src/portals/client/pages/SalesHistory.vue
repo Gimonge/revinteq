@@ -11,12 +11,12 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="rv-btn rv-btn-s rv-btn-sm" @click="printSales" title="Print filtered results">🖨️ Print</button>
+        <button class="rv-btn rv-btn-s rv-btn-sm" @click="printSales" title="Print filtered results"><i class="ti ti-printer" aria-hidden="true"></i> Print</button>
         <button class="rv-btn rv-btn-s rv-btn-sm" @click="exportExcel" :disabled="exporting" title="Export to Excel">
           <span v-if="exporting" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-          <span v-else>📥 Export Excel</span>
+          <span v-else><i class="ti ti-download" aria-hidden="true"></i> Export Excel</span>
         </button>
-        <button class="rv-btn rv-btn-p rv-btn-sm" @click="$emit('nav','log')">✏️ Log Sale</button>
+        <button class="rv-btn rv-btn-p rv-btn-sm" @click="$emit('nav','log')"><i class="ti ti-pencil" aria-hidden="true"></i> Log Sale</button>
       </div>
     </div>
 
@@ -24,7 +24,7 @@
     <div class="rv-card card-reveal">
       <div class="rv-ch">
         <span class="rv-ct">Filters</span>
-        <button v-if="hasActiveFilters" class="rv-btn rv-btn-s rv-btn-xs" @click="clearFilters">✕ Clear all</button>
+        <button v-if="hasActiveFilters" class="rv-btn rv-btn-s rv-btn-xs" @click="clearFilters"><i class="ti ti-x" aria-hidden="true"></i> Clear all</button>
       </div>
       <div class="rv-cb" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
@@ -91,7 +91,7 @@
         <div style="display:flex;align-items:center;gap:10px">
           <button class="rv-btn rv-btn-p rv-btn-sm" @click="applyFilters" :disabled="loading">
             <span v-if="loading" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-            <span v-else>🔍 Apply Filters</span>
+            <span v-else><i class="ti ti-search" aria-hidden="true"></i> Apply Filters</span>
           </button>
           <span v-if="hasActiveFilters" style="font-size:12px;color:var(--slate-mid);font-weight:600">
             Showing filtered results
@@ -180,14 +180,14 @@
               </td>
               <td style="white-space:nowrap" @click.stop>
                 <div style="display:flex;gap:4px">
-                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openEditSale(s)" title="Edit">✏️</button>
-                  <button class="rv-btn rv-btn-d rv-btn-xs" @click="deleteSale(s)" title="Delete">🗑️</button>
+                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openEditSale(s)" title="Edit"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+                  <button class="rv-btn rv-btn-d rv-btn-xs" @click="deleteSale(s)" title="Delete"><i class="ti ti-trash" aria-hidden="true"></i></button>
                 </div>
               </td>
             </tr>
             <tr v-if="sales.length===0">
               <td colspan="8" style="text-align:center;color:var(--slate-light);padding:48px">
-                <div style="font-size:32px;margin-bottom:12px">📋</div>
+                <div style="font-size:32px;margin-bottom:12px"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
                 <div style="font-weight:800;font-size:14px;margin-bottom:4px">No sales found</div>
                 <div style="font-size:12.5px">{{ hasActiveFilters ? 'Try adjusting your filters' : 'Log your first sale to get started' }}</div>
               </td>
@@ -210,7 +210,7 @@
     <div class="rv-card" style="width:100%;max-width:520px;max-height:90vh;overflow-y:auto">
       <div class="rv-ch">
         <div class="rv-ct">Edit Sale</div>
-        <button @click="editSale=null" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--slate-light)">✕</button>
+        <button @click="editSale=null" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--slate-light)"><i class="ti ti-x" aria-hidden="true"></i></button>
       </div>
       <div class="rv-cb" style="display:flex;flex-direction:column;gap:12px">
         <div class="rv-fg" style="margin:0"><label class="rv-fl">Customer Name</label><input v-model="editForm.customer_name" class="rv-fi"></div>
@@ -243,7 +243,7 @@
         <div style="display:flex;gap:8px;margin-top:4px">
           <button class="rv-btn rv-btn-p" @click="saveEditSale" :disabled="savingEdit">
             <span v-if="savingEdit" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-            <span v-else>💾 Save Changes</span>
+            <span v-else><i class="ti ti-device-floppy" aria-hidden="true"></i> Save Changes</span>
           </button>
           <button class="rv-btn rv-btn-s" @click="editSale=null">Cancel</button>
         </div>

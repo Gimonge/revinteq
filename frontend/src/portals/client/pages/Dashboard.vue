@@ -12,7 +12,7 @@
     <div class="rv-gps fade-up" :class="gpsClass">
       <div>
         <div class="rv-gps-lbl">Revenue GPS — {{ monthLabel }}</div>
-        <div class="rv-gps-status">{{ gpsIcon }} {{ gpsTitle }}</div>
+        <div class="rv-gps-status"><i :class="['ti', gpsIcon]" aria-hidden="true"></i> {{ gpsTitle }}</div>
         <div class="rv-gps-sub">{{ gpsSub }}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
@@ -67,7 +67,7 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <!-- Facebook -->
           <div style="background:var(--bg);border-radius:var(--r-md);padding:14px;border:1px solid var(--border)">
-            <div style="font-size:10.5px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">📘 Facebook</div>
+            <div style="font-size:10.5px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px"><i class="ti ti-brand-facebook" aria-hidden="true"></i> Facebook</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div><div style="font-size:10px;color:var(--slate-light);font-weight:700">Spend</div><div style="font-size:14px;font-weight:900">{{ fmtK(adSpend.facebook.spend) }}</div></div>
               <div><div style="font-size:10px;color:var(--slate-light);font-weight:700">Impressions</div><div style="font-size:14px;font-weight:900">{{ fmtNum(adSpend.facebook.impressions) }}</div></div>
@@ -77,7 +77,7 @@
           </div>
           <!-- Instagram -->
           <div style="background:var(--bg);border-radius:var(--r-md);padding:14px;border:1px solid var(--border)">
-            <div style="font-size:10.5px;font-weight:800;background:linear-gradient(90deg,var(--ig1),var(--ig3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">📸 Instagram</div>
+            <div style="font-size:10.5px;font-weight:800;background:linear-gradient(90deg,var(--ig1),var(--ig3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px"><i class="ti ti-brand-instagram" aria-hidden="true"></i> Instagram</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div><div style="font-size:10px;color:var(--slate-light);font-weight:700">Spend</div><div style="font-size:14px;font-weight:900">{{ fmtK(adSpend.instagram.spend) }}</div></div>
               <div><div style="font-size:10px;color:var(--slate-light);font-weight:700">Impressions</div><div style="font-size:14px;font-weight:900">{{ fmtNum(adSpend.instagram.impressions) }}</div></div>
@@ -88,7 +88,7 @@
         </div>
         <!-- DM conversations by channel -->
         <div>
-          <div style="font-size:10.5px;font-weight:800;color:var(--slate-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">💬 Conversations started from ads (last 30 days)</div>
+          <div style="font-size:10.5px;font-weight:800;color:var(--slate-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px"><i class="ti ti-message-circle" aria-hidden="true"></i> Conversations started from ads (last 30 days)</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
             <div style="text-align:center;padding:10px;background:var(--green-light);border-radius:var(--r-md)">
               <div style="font-size:18px;font-weight:900;color:var(--green)">{{ waClicks.whatsapp }}</div>
@@ -133,44 +133,44 @@
 
           <!-- 1. No goal set -->
           <div v-if="!hasGoal" class="rv-al rv-al-b" style="margin:0">
-            🎯 <strong>Set a monthly revenue goal</strong> — Go to Revenue Goals to activate your GPS tracker and start measuring progress this month.
+            <i class="ti ti-target" aria-hidden="true"></i> <strong>Set a monthly revenue goal</strong> — Go to Revenue Goals to activate your GPS tracker and start measuring progress this month.
           </div>
 
           <!-- 2. Goal progress -->
           <div v-if="hasGoal && metrics.goal_status==='ahead'" class="rv-al rv-al-g" style="margin:0">
-            🚀 <strong>Ahead of goal!</strong> You're {{ gpsPercent }}% towards your {{ monthLabel }} target. Keep logging every sale to maintain accuracy.
+            <i class="ti ti-rocket" aria-hidden="true"></i> <strong>Ahead of goal!</strong> You're {{ gpsPercent }}% towards your {{ monthLabel }} target. Keep logging every sale to maintain accuracy.
           </div>
           <div v-else-if="hasGoal && metrics.goal_status==='behind'" class="rv-al rv-al-a" style="margin:0">
-            ⚠️ <strong>Behind target.</strong> You're {{ gpsPercent }}% towards goal. You need <strong>{{ fmtK(metrics.required_daily_revenue) }}/day</strong> for the rest of the month to catch up.
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i> <strong>Behind target.</strong> You're {{ gpsPercent }}% towards goal. You need <strong>{{ fmtK(metrics.required_daily_revenue) }}/day</strong> for the rest of the month to catch up.
           </div>
           <div v-else-if="hasGoal && metrics.goal_status==='on_track'" class="rv-al rv-al-b" style="margin:0">
-            ✅ <strong>On track!</strong> {{ gpsPercent }}% to goal — {{ dayjs().daysInMonth()-dayjs().date() }} days left this month.
+            <i class="ti ti-circle-check" aria-hidden="true"></i> <strong>On track!</strong> {{ gpsPercent }}% to goal — {{ dayjs().daysInMonth()-dayjs().date() }} days left this month.
           </div>
 
           <!-- 3. No sales today -->
           <div v-if="hasGoal && todayRevenue===0" class="rv-al rv-al-a" style="margin:0">
-            📋 <strong>No sales logged today.</strong> Made a sale? Log it now to keep your Revenue GPS accurate.
+            <i class="ti ti-clipboard-list" aria-hidden="true"></i> <strong>No sales logged today.</strong> Made a sale? Log it now to keep your Revenue GPS accurate.
           </div>
 
           <!-- 4. Cold pipeline deals -->
           <div v-if="coldDeals>0" class="rv-al rv-al-a" style="margin:0">
-            🔥 <strong>{{ coldDeals }} pipeline deal{{ coldDeals>1?'s are':' is' }} going cold.</strong> These contacts haven't been followed up — reach out today before they go cold.
+            <i class="ti ti-flame" aria-hidden="true"></i> <strong>{{ coldDeals }} pipeline deal{{ coldDeals>1?'s are':' is' }} going cold.</strong> These contacts haven't been followed up — reach out today before they go cold.
           </div>
 
           <!-- 5. Facebook not connected -->
           <div v-if="!auth.tenant?.meta_fb_connected" class="rv-al rv-al-b" style="margin:0">
-            📘 <strong>Connect your Facebook Ads</strong> — Go to Facebook Ads and connect your account to track ad spend and measure ROI automatically.
+            <i class="ti ti-brand-facebook" aria-hidden="true"></i> <strong>Connect your Facebook Ads</strong> — Go to Facebook Ads and connect your account to track ad spend and measure ROI automatically.
           </div>
 
           <!-- 6. AOV tip -->
           <div v-if="hasGoal && metrics.avg_order_value>0 && salesNeeded>0" style="font-size:12.5px;color:var(--slate-mid);font-weight:600;line-height:1.6;padding:10px 12px;background:var(--bg);border-radius:var(--r-md)">
-            💡 At your current average order of <strong>{{ fmtK(metrics.avg_order_value) }}</strong>, you need approximately <strong>{{ salesNeeded }} more sales</strong> to reach your {{ monthLabel }} goal.
+            <i class="ti ti-bulb" aria-hidden="true"></i> At your current average order of <strong>{{ fmtK(metrics.avg_order_value) }}</strong>, you need approximately <strong>{{ salesNeeded }} more sales</strong> to reach your {{ monthLabel }} goal.
           </div>
 
           <!-- 7. All good -->
           <div v-if="hasGoal && coldDeals===0 && todayRevenue>0 && metrics.goal_status!=='behind' && auth.tenant?.meta_fb_connected"
             class="rv-al rv-al-g" style="margin:0">
-            ✅ <strong>Everything looks good today.</strong> Keep logging sales and following up on your pipeline.
+            <i class="ti ti-circle-check" aria-hidden="true"></i> <strong>Everything looks good today.</strong> Keep logging sales and following up on your pipeline.
           </div>
 
         </div>
@@ -203,7 +203,7 @@ const monthLabel  = computed(() => dayjs().format('MMMM YYYY'))
 const hasGoal     = computed(() => !!metrics.value.revenue_goal)
 const gpsPercent  = computed(() => Math.round(metrics.value.goal_progress_percent || 0))
 const gpsClass    = computed(() => metrics.value.goal_status || 'no_goal')
-const gpsIcon     = computed(() => ({ ahead:'🚀', on_track:'✅', behind:'⚠️', no_goal:'📍' })[gpsClass.value])
+const gpsIcon     = computed(() => ({ ahead:'ti-rocket', on_track:'ti-circle-check', behind:'ti-alert-triangle', no_goal:'ti-map-pin' })[gpsClass.value])
 const gpsTitle    = computed(() => ({ ahead:'Ahead of Goal', on_track:'On Track', behind:'Behind Goal', no_goal:'No Goal Set' })[gpsClass.value])
 const gpsSub      = computed(() => {
   if (!hasGoal.value) return 'Go to Revenue Goals to set a monthly target'

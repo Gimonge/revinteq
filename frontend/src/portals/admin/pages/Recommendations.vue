@@ -10,25 +10,25 @@
 
     <div class="rv-stat-grid">
       <div class="rv-sc card-reveal" style="cursor:pointer" :class="{active:tab==='recs'}" @click="tab='recs'">
-        <span class="rv-sc-icon">💡</span>
+        <span class="rv-sc-icon"><i class="ti ti-bulb" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Recommendations</div>
         <div class="rv-sc-value">{{ recs.length }}</div>
         <div class="rv-sc-sub">{{ recs.filter(r=>r.priority==='HIGH').length }} high priority</div>
       </div>
       <div class="rv-sc b card-reveal" style="cursor:pointer;animation-delay:.05s" @click="tab='ads'">
-        <span class="rv-sc-icon">📊</span>
+        <span class="rv-sc-icon"><i class="ti ti-chart-bar" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Ad Intelligence</div>
         <div class="rv-sc-value">{{ adAlerts.length }}</div>
         <div class="rv-sc-sub">{{ allCampaigns.length }} campaigns tracked</div>
       </div>
       <div class="rv-sc a card-reveal" style="cursor:pointer;animation-delay:.1s" @click="tab='goals'">
-        <span class="rv-sc-icon">🎯</span>
+        <span class="rv-sc-icon"><i class="ti ti-target" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Goal Alerts</div>
         <div class="rv-sc-value">{{ goalAlerts.filter(g=>g.urgent).length }}</div>
         <div class="rv-sc-sub">{{ clients.filter(c=>c.goal_status==='behind').length }} clients behind goal</div>
       </div>
       <div class="rv-sc p card-reveal" style="cursor:pointer;animation-delay:.15s" @click="tab='pipeline'">
-        <span class="rv-sc-icon">🔥</span>
+        <span class="rv-sc-icon"><i class="ti ti-flame" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Pipeline Alerts</div>
         <div class="rv-sc-value">{{ pipelineAlerts.length }}</div>
         <div class="rv-sc-sub">Stale deals &amp; follow-ups needed</div>
@@ -40,7 +40,7 @@
         @click="tab=t.key"
         :class="tab===t.key ? 'rv-btn rv-btn-p' : 'rv-btn rv-btn-s'"
         style="flex:1;justify-content:center;font-size:12px;padding:7px 10px">
-        {{ t.icon }} {{ t.label }}
+        <i :class="['ti', t.icon]" aria-hidden="true"></i> {{ t.label }}
         <span v-if="t.count" class="rv-nav-badge" style="background:rgba(0,0,0,.1);color:inherit">{{ t.count }}</span>
       </button>
     </div>
@@ -49,7 +49,7 @@
     <div v-if="tab==='recs'">
       <div v-if="loadingRecs" style="padding:40px;text-align:center"><span class="rv-spin"></span></div>
       <div v-else-if="recs.length===0" class="rv-empty">
-        <div class="rv-empty-icon">✅</div>
+        <div class="rv-empty-icon"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
         <div class="rv-empty-title">All clear — no pending recommendations</div>
         <div class="rv-empty-sub">Check back as clients log more activity</div>
       </div>
@@ -57,7 +57,7 @@
         <template v-for="priority in ['HIGH','MEDIUM','INFO']" :key="priority">
           <div v-if="recsByPriority[priority]?.length">
             <div class="rv-sec-lbl" style="margin-bottom:10px">
-              {{ priorityIcon(priority) }} {{ priority }} PRIORITY
+              <i :class="['ti', priorityIcon(priority)]" :style="{color: priorityColor(priority)}" aria-hidden="true"></i> {{ priority }} PRIORITY
               <span class="rv-badge" :class="priority==='HIGH'?'rv-br':priority==='MEDIUM'?'rv-ba':'rv-bb'" style="font-size:10px;margin-left:4px">
                 {{ recsByPriority[priority].length }}
               </span>
@@ -77,7 +77,7 @@
                   <div style="font-size:12px;color:var(--slate-mid);font-weight:600;line-height:1.5">{{ r.message }}</div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openClientByName(r.tenant_name)">View →</button>
+                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openClientByName(r.tenant_name)">View <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
                   <button class="rv-btn rv-btn-s rv-btn-xs" @click="dismiss(r)">Dismiss</button>
                 </div>
               </div>
@@ -91,7 +91,7 @@
     <div v-if="tab==='ads'">
       <div v-if="loadingAds && !adsInitialLoaded" style="padding:40px;text-align:center"><span class="rv-spin"></span></div>
       <div v-else-if="allCampaigns.length===0" class="rv-empty">
-        <div class="rv-empty-icon">📊</div>
+        <div class="rv-empty-icon"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
         <div class="rv-empty-title">No ad data</div>
         <div class="rv-empty-sub">Connect Meta accounts for clients to see campaign intelligence</div>
       </div>
@@ -101,7 +101,7 @@
         <div v-if="tokenAlerts.length" style="display:flex;flex-direction:column;gap:6px">
           <div v-for="t in tokenAlerts" :key="t.account_id"
             class="rv-al" :class="t.status==='expired'?'rv-al-r':'rv-al-a'" style="margin:0;font-size:12px">
-            {{ t.status==='expired'?'🔴':'🟡' }}
+            <i class="ti ti-circle-filled" :style="{color: t.status==='expired'?'#dc2626':'#d97706'}" aria-hidden="true"></i>
             <strong>{{ t.tenant_name }}</strong> —
             {{ t.status==='expired'?`Token EXPIRED for ${t.account_name}. Reconnect immediately.`:`Token expires in ${t.days_left} days for ${t.account_name}.` }}
           </div>
@@ -137,7 +137,7 @@
                 <option value="instagram">Instagram</option>
               </select>
               <input v-model="adSearch" class="rv-fi" placeholder="Search campaigns..." style="font-size:12px;padding:5px 8px;flex:1;min-width:160px">
-              <button v-if="adFilterClient||adFilterStatus||adFilterPlatform||adSearch" class="rv-btn rv-btn-s rv-btn-xs" @click="clearAdFilters">✕ Clear</button>
+              <button v-if="adFilterClient||adFilterStatus||adFilterPlatform||adSearch" class="rv-btn rv-btn-s rv-btn-xs" @click="clearAdFilters"><i class="ti ti-x" aria-hidden="true"></i> Clear</button>
               <span style="font-size:11px;color:var(--slate-mid);margin-left:auto;display:flex;align-items:center;gap:6px">
                 <span v-if="loadingAds && adsInitialLoaded" class="rv-spin" style="width:10px;height:10px;border-width:2px;opacity:.5"></span>
                 {{ adFiltered.length }} of {{ allCampaigns.length }} campaigns
@@ -189,7 +189,7 @@
             </div>
           </div>
           <div style="padding:8px 16px;background:var(--green-light);border-top:1px solid var(--border);font-size:11px;color:var(--green);font-weight:600">
-            💡 {{ platformRecommendation }}
+            <i class="ti ti-bulb" aria-hidden="true"></i> {{ platformRecommendation }}
           </div>
         </div>
 
@@ -287,7 +287,7 @@
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
           <div v-for="gs in goalSummary" :key="gs.label"
             style="background:var(--card);border-radius:var(--r-md);border:1px solid var(--border);padding:14px 16px;text-align:center">
-            <div style="font-size:24px;margin-bottom:4px">{{ gs.icon }}</div>
+            <div style="font-size:24px;margin-bottom:4px"><i :class="['ti', gs.icon]" aria-hidden="true"></i></div>
             <div style="font-size:20px;font-weight:900;color:var(--slate)">{{ gs.count }}</div>
             <div style="font-size:11px;font-weight:700;color:var(--slate-mid)">{{ gs.label }}</div>
           </div>
@@ -295,7 +295,7 @@
         <div v-for="status in ['behind','on_track','ahead','no_goal']" :key="status">
           <div v-if="clientsByGoalStatus[status]?.length">
             <div class="rv-sec-lbl" style="margin:12px 0 8px">
-              {{ goalStatusIcon(status) }} {{ goalStatusLabel(status) }}
+              <i :class="['ti', goalStatusIcon(status)]" aria-hidden="true"></i> {{ goalStatusLabel(status) }}
               ({{ clientsByGoalStatus[status].length }})
             </div>
             <div style="display:flex;flex-direction:column;gap:8px">
@@ -324,7 +324,7 @@
                   </div>
                   <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;align-items:flex-end">
                     <span class="rv-badge" :class="goalBadge(c.goal_status)">{{ goalStatusLabel(c.goal_status) }}</span>
-                    <button class="rv-btn rv-btn-s rv-btn-xs" @click="openClientObj(c)">Open →</button>
+                    <button class="rv-btn rv-btn-s rv-btn-xs" @click="openClientObj(c)">Open <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
                   </div>
                 </div>
               </div>
@@ -337,7 +337,7 @@
     <!-- TAB 4 — PIPELINE ALERTS -->
     <div v-if="tab==='pipeline'">
       <div v-if="pipelineAlerts.length===0" class="rv-empty">
-        <div class="rv-empty-icon">🎯</div>
+        <div class="rv-empty-icon"><i class="ti ti-target" aria-hidden="true"></i></div>
         <div class="rv-empty-title">Pipeline looks healthy</div>
         <div class="rv-empty-sub">No stale deals or urgent follow-ups at the moment</div>
       </div>
@@ -345,7 +345,7 @@
         <div v-for="alert in pipelineAlerts" :key="alert.key" class="rv-card">
           <div class="rv-ch">
             <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:20px">{{ alert.icon }}</span>
+              <span style="font-size:20px"><i :class="['ti', alert.icon]" aria-hidden="true"></i></span>
               <div>
                 <div class="rv-ct">{{ alert.title }}</div>
                 <div class="rv-cst">{{ alert.sub }}</div>
@@ -356,7 +356,7 @@
           <div class="rv-cb">
             <div style="font-size:13px;color:var(--slate-mid);font-weight:600;line-height:1.6">{{ alert.msg }}</div>
             <div style="margin-top:10px;display:flex;gap:8px">
-              <button class="rv-btn rv-btn-b rv-btn-sm" @click="openClientByName(alert.client)">View {{ alert.client }} →</button>
+              <button class="rv-btn rv-btn-b rv-btn-sm" @click="openClientByName(alert.client)">View {{ alert.client }} <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
             </div>
           </div>
         </div>
@@ -388,16 +388,15 @@ const adFilterPlatform = ref('')
 const adSearch          = ref('')
 const adSearchDebounced  = ref('')
 let _adSearchTimer       = null
-const adSearchDebounced = ref('')
 let adSearchTimer = null
 const adPage           = ref(1)
 const adPageSize       = 20
 
 const tabs = computed(() => [
-  { key:'recs',     icon:'💡', label:'Recommendations', count: recs.value.length || null },
-  { key:'ads',      icon:'📊', label:'Ad Intelligence',  count: adAlerts.value.length || null },
-  { key:'goals',    icon:'🎯', label:'Goal Tracking',    count: clients.value.filter(c=>c.goal_status==='behind').length || null },
-  { key:'pipeline', icon:'🔥', label:'Pipeline Alerts',  count: pipelineAlerts.value.length || null },
+  { key:'recs',     icon:'ti-bulb', label:'Recommendations', count: recs.value.length || null },
+  { key:'ads',      icon:'ti-chart-bar', label:'Ad Intelligence',  count: adAlerts.value.length || null },
+  { key:'goals',    icon:'ti-target', label:'Goal Tracking',    count: clients.value.filter(c=>c.goal_status==='behind').length || null },
+  { key:'pipeline', icon:'ti-flame', label:'Pipeline Alerts',  count: pipelineAlerts.value.length || null },
 ])
 
 function fmtK(v, cur) { return _fmtK(v, cur || 'KES') }
@@ -409,9 +408,10 @@ function roiColor(roi)      { return roi>=150?'var(--green)':roi>=50?'var(--blue
 function goalBarColor(s)    { return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)','no_goal':'var(--border-mid)'}[s]||'var(--border-mid)' }
 function goalColor(s)       { return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)'}[s]||'var(--slate-light)' }
 function goalBadge(s)       { return {'ahead':'rv-bg','on_track':'rv-bb','behind':'rv-ba','no_goal':'rv-bgy'}[s]||'rv-bgy' }
-function goalStatusLabel(s) { return {'ahead':'🚀 Ahead','on_track':'✅ On Track','behind':'⚠️ Behind','no_goal':'No Goal'}[s]||s }
-function goalStatusIcon(s)  { return {'ahead':'🚀','on_track':'✅','behind':'⚠️','no_goal':'📍'}[s]||'' }
-function priorityIcon(p)    { return {'HIGH':'🔴','MEDIUM':'🟡','INFO':'🔵'}[p]||'' }
+function goalStatusLabel(s) { return {'ahead':'Ahead','on_track':'On Track','behind':'Behind','no_goal':'No Goal'}[s]||s }
+function goalStatusIcon(s)  { return {'ahead':'ti-rocket','on_track':'ti-circle-check','behind':'ti-alert-triangle','no_goal':'ti-map-pin'}[s]||'' }
+function priorityIcon(p)    { return {'HIGH':'ti-circle-filled','MEDIUM':'ti-circle-filled','INFO':'ti-circle-filled'}[p]||'' }
+function priorityColor(p)   { return {'HIGH':'#dc2626','MEDIUM':'#d97706','INFO':'#2563eb'}[p]||'' }
 const GRADS = [
   'linear-gradient(135deg,#1F7A4C,#2563EB)',
   'linear-gradient(135deg,#7C3AED,#DD2A7B)',
@@ -432,7 +432,7 @@ function campaignTags(c) {
   if ((c.ctr||0) < 1 && c.status==='ACTIVE') t.push({l:'Low CTR', c:'rv-ba'})
   if ((c.ctr||0) >= 2)                        t.push({l:'Strong CTR', c:'rv-bg'})
   if (c.cpr && c.aov && c.cpr > c.aov*0.5)   t.push({l:'High CPR', c:'rv-ba'})
-  if ((c.roi||0) >= 150)                       t.push({l:'Scale ↑', c:'rv-bg'})
+  if ((c.roi||0) >= 150)                       t.push({l:'Scale <i class="ti ti-arrow-up" aria-hidden="true"></i>', c:'rv-bg'})
   if ((c.roi||0) > 0 && c.roi < 50 && c.spend>0) t.push({l:'Poor ROI', c:'rv-br'})
   if (!c.conversations && (c.spend||0)>0)     t.push({l:'No DMs', c:'rv-br'})
   return t
@@ -457,10 +457,10 @@ const adAlerts = computed(() => {
   const scale   = allCampaigns.value.filter(c=>(c.roi||0)>=150)
   const noConv  = allCampaigns.value.filter(c=>!c.conversations && (c.spend||0)>0)
   const poorRoi = allCampaigns.value.filter(c=>(c.roi||0)>0 && c.roi<50 && (c.spend||0)>0)
-  if (low.length)     alerts.push({key:'lowctr', type:'rv-al-a', affectedClients:[...new Set(low.map(c=>c.client_name))],    msg:`⚠️ ${low.length} active campaign(s) have CTR below 1%`})
-  if (scale.length)   alerts.push({key:'scale',  type:'rv-al-g', affectedClients:[...new Set(scale.map(c=>c.client_name))],  msg:`🚀 ${scale.length} campaign(s) ROI ≥ 150% — ready to scale`})
-  if (noConv.length)  alerts.push({key:'noconv', type:'rv-al-r', affectedClients:[...new Set(noConv.map(c=>c.client_name))], msg:`🔇 ${noConv.length} campaign(s) spending but zero DMs`})
-  if (poorRoi.length) alerts.push({key:'poorroi',type:'rv-al-r', affectedClients:[...new Set(poorRoi.map(c=>c.client_name))],msg:`📉 ${poorRoi.length} campaign(s) ROI under 50%`})
+  if (low.length)     alerts.push({key:'lowctr', type:'rv-al-a', affectedClients:[...new Set(low.map(c=>c.client_name))],    msg:`<i class="ti ti-alert-triangle" aria-hidden="true"></i> ${low.length} active campaign(s) have CTR below 1%`})
+  if (scale.length)   alerts.push({key:'scale',  type:'rv-al-g', affectedClients:[...new Set(scale.map(c=>c.client_name))],  msg:`<i class="ti ti-rocket" aria-hidden="true"></i> ${scale.length} campaign(s) ROI ≥ 150% — ready to scale`})
+  if (noConv.length)  alerts.push({key:'noconv', type:'rv-al-r', affectedClients:[...new Set(noConv.map(c=>c.client_name))], msg:`<i class="ti ti-bell-off" aria-hidden="true"></i> ${noConv.length} campaign(s) spending but zero DMs`})
+  if (poorRoi.length) alerts.push({key:'poorroi',type:'rv-al-r', affectedClients:[...new Set(poorRoi.map(c=>c.client_name))],msg:`<i class="ti ti-trending-down" aria-hidden="true"></i> ${poorRoi.length} campaign(s) ROI under 50%`})
   return alerts
 })
 
@@ -573,10 +573,10 @@ const clientsByGoalStatus = computed(() => ({
 }))
 
 const goalSummary = computed(() => [
-  { icon:'⚠️', count: clientsByGoalStatus.value.behind.length,   label:'Behind Goal' },
-  { icon:'✅', count: clientsByGoalStatus.value.on_track.length,  label:'On Track' },
-  { icon:'🚀', count: clientsByGoalStatus.value.ahead.length,     label:'Ahead of Goal' },
-  { icon:'📍', count: clientsByGoalStatus.value.no_goal.length,   label:'No Goal Set' },
+  { icon:'ti-alert-triangle', count: clientsByGoalStatus.value.behind.length,   label:'Behind Goal' },
+  { icon:'ti-circle-check', count: clientsByGoalStatus.value.on_track.length,  label:'On Track' },
+  { icon:'ti-rocket', count: clientsByGoalStatus.value.ahead.length,     label:'Ahead of Goal' },
+  { icon:'ti-map-pin', count: clientsByGoalStatus.value.no_goal.length,   label:'No Goal Set' },
 ])
 
 const goalAlerts = computed(() =>
@@ -589,7 +589,7 @@ const pipelineAlerts = computed(() => {
   clients.value.forEach(c => {
     if ((c.open_deals||0) > 10)
       alerts.push({
-        key:`pipe_${c.id}`, icon:'🔥', urgent:true, client:c.name,
+        key:`pipe_${c.id}`, icon:'ti-flame', urgent:true, client:c.name,
         title:`${c.name} has ${c.open_deals} open deals`,
         sub:'Large pipeline — may need follow-up prioritisation',
         msg:`${c.name} has ${c.open_deals} deals in pipeline. Review and follow up on the oldest deals before they go cold.`,
@@ -599,7 +599,7 @@ const pipelineAlerts = computed(() => {
       : parseInt(c.last_sale) || 5
     if (daysSinceSale >= 5 && c.monthly_goal)
       alerts.push({
-        key:`sale_${c.id}`, icon:'📋', urgent:daysSinceSale>=7, client:c.name,
+        key:`sale_${c.id}`, icon:'ti-clipboard-list', urgent:daysSinceSale>=7, client:c.name,
         title:`${c.name} — no sales in ${daysSinceSale}+ days`,
         sub:'Client may not be logging offline sales',
         msg:`${c.name} has a monthly goal but last sale was ${daysSinceSale}+ days ago. Remind them to log all sales to keep Revenue GPS accurate.`,

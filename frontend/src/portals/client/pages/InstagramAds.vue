@@ -13,22 +13,22 @@
       <div style="display:flex;gap:8px">
         <button class="rv-btn rv-btn-s rv-btn-sm" @click="syncNow(true)" :disabled="syncing">
           <span v-if="syncing" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-          <span v-else>↻ Force Sync</span>
+          <span v-else><i class="ti ti-refresh" aria-hidden="true"></i> Force Sync</span>
         </button>
         <button v-if="!connected" @click="connectInstagram" :disabled="connecting"
   style="background:linear-gradient(135deg,var(--ig1),var(--ig2));color:#fff;border:none;padding:6px 13px;border-radius:var(--r-md);font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
   <span v-if="connecting" class="rv-spin" style="width:12px;height:12px;border-width:2px;border-color:rgba(255,255,255,.3);border-top-color:#fff"></span>
-  <span v-else>📸 Connect Instagram</span>
+  <span v-else><i class="ti ti-brand-instagram" aria-hidden="true"></i> Connect Instagram</span>
 </button>
         <button v-else disabled
   style="background:var(--green);color:#fff;border:none;padding:6px 13px;border-radius:var(--r-md);font-size:12px;font-weight:800;opacity:.7;cursor:default;display:inline-flex;align-items:center;gap:6px">
-  ✅ Instagram Connected
+  <i class="ti ti-circle-check" aria-hidden="true"></i> Instagram Connected
 </button>
       </div>
     </div>
 
     <div v-if="!connected" class="rv-al rv-al-b card-reveal">
-      📘 Connect your Instagram Ads account to see performance data here. Click "Connect Facebook" to get started.
+      <i class="ti ti-brand-facebook" aria-hidden="true"></i> Connect your Instagram Ads account to see performance data here. Click "Connect Facebook" to get started.
     </div>
 
     <template v-if="connected">
@@ -59,15 +59,15 @@
       <!-- Full metrics strip: CTR, CPM, CPR, Frequency, Impressions, Clicks, AOV -->
       <div class="rv-aov card-reveal" style="animation-delay:.25s">
         <div class="rv-aov-cell">
-          <div class="rv-aov-label" title="Click-Through Rate — clicks ÷ impressions">CTR ℹ</div>
+          <div class="rv-aov-label" title="Click-Through Rate — clicks ÷ impressions">CTR <i class="ti ti-info-circle" aria-hidden="true"></i></div>
           <div class="rv-aov-value" :style="{color:ctrColor(totals.ctr)}">{{ totals.ctr }}%</div>
         </div>
         <div class="rv-aov-cell">
-          <div class="rv-aov-label" title="Cost per 1,000 impressions">CPM ℹ</div>
+          <div class="rv-aov-label" title="Cost per 1,000 impressions">CPM <i class="ti ti-info-circle" aria-hidden="true"></i></div>
           <div class="rv-aov-value">{{ fmtK(totals.cpm) }}</div>
         </div>
         <div class="rv-aov-cell">
-          <div class="rv-aov-label" title="Cost per DM conversation started">CPR ℹ</div>
+          <div class="rv-aov-label" title="Cost per DM conversation started">CPR <i class="ti ti-info-circle" aria-hidden="true"></i></div>
           <div class="rv-aov-value" :style="{color:cprColor(totals.cpr,totals.aov)}">{{ fmtK(totals.cpr) }}</div>
         </div>
         <div class="rv-aov-cell">
@@ -187,7 +187,7 @@
         <div class="rv-cb">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div v-for="m in metricDefs" :key="m.key" style="display:flex;gap:10px;align-items:flex-start">
-              <div style="width:40px;height:40px;border-radius:var(--r-md);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">{{ m.icon }}</div>
+              <div style="width:40px;height:40px;border-radius:var(--r-md);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0"><i :class="['ti', m.icon]" aria-hidden="true"></i></div>
               <div>
                 <div style="font-size:12.5px;font-weight:900;color:var(--slate)">{{ m.name }}</div>
                 <div style="font-size:11.5px;color:var(--slate-mid);font-weight:600;line-height:1.4">{{ m.def }}</div>
@@ -247,10 +247,10 @@ const totals = computed(() => {
 })
 
 const metricDefs = [
-  { key:'ctr', icon:'👆', name:'CTR — Click-Through Rate',    def:'Percentage of people who saw your ad and clicked the message button. Outbound clicks ÷ impressions × 100.', benchmark:'Benchmark: ≥2% is strong, 1–2% average, <1% needs creative refresh' },
-  { key:'cpm', icon:'👁️', name:'CPM — Cost Per 1,000 Impressions', def:'How much you pay to show your ad to 1,000 people. Driven by audience size, competition and time of year.', benchmark:'Lower CPM = cheaper reach. Kenya CPMs are lower than Western markets' },
-  { key:'cpr', icon:'💬', name:'CPR — Cost Per Result',        def:'How much you pay for each DM conversation started. Total spend ÷ conversations. Your key cost metric.', benchmark:'Ideal: CPR < 20% of your Average Order Value' },
-  { key:'roi', icon:'💰', name:'ROI — Return on Ad Spend',     def:'(Revenue - Spend) ÷ Spend × 100. How much revenue you earned for every KES spent on ads.', benchmark:'Target: ≥150% ROI. Above 300% = scale the budget' },
+  { key:'ctr', icon:'ti-hand-click', name:'CTR — Click-Through Rate',    def:'Percentage of people who saw your ad and clicked the message button. Outbound clicks ÷ impressions × 100.', benchmark:'Benchmark: ≥2% is strong, 1–2% average, <1% needs creative refresh' },
+  { key:'cpm', icon:'ti-eye', name:'CPM — Cost Per 1,000 Impressions', def:'How much you pay to show your ad to 1,000 people. Driven by audience size, competition and time of year.', benchmark:'Lower CPM = cheaper reach. Kenya CPMs are lower than Western markets' },
+  { key:'cpr', icon:'ti-message-circle', name:'CPR — Cost Per Result',        def:'How much you pay for each DM conversation started. Total spend ÷ conversations. Your key cost metric.', benchmark:'Ideal: CPR < 20% of your Average Order Value' },
+  { key:'roi', icon:'ti-currency-dollar', name:'ROI — Return on Ad Spend',     def:'(Revenue - Spend) ÷ Spend × 100. How much revenue you earned for every KES spent on ads.', benchmark:'Target: ≥150% ROI. Above 300% = scale the budget' },
 ]
 
 function round2(v) { return Math.round(v * 100) / 100 }
@@ -330,7 +330,7 @@ onMounted(async () => {
   if (params.get('meta_connected') === '1') {
     window.history.replaceState({}, '', window.location.pathname)
     await auth.fetchUser()
-    emit('toast', '✅ Instagram connected successfully! Your ad data is now syncing.', 'green')
+    emit('toast', 'Instagram connected successfully! Your ad data is now syncing.', 'green')
   }
   if (params.get('meta_error')) {
     const errMsg = decodeURIComponent(params.get('meta_error'))

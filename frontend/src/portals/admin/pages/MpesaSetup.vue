@@ -8,7 +8,7 @@
     </div>
 
     <div class="rv-al rv-al-b card-reveal">
-      ℹ️ Select a client from the Clients page to configure their M-Pesa credentials, or use the Client Detail page directly.
+      <i class="ti ti-info-circle" aria-hidden="true"></i> Select a client from the Clients page to configure their M-Pesa credentials, or use the Client Detail page directly.
     </div>
 
     <div class="rv-card card-reveal">
@@ -37,7 +37,7 @@
                 <span v-else style="color:var(--slate-light)">Not configured</span>
               </td>
               <td>
-                <span v-if="t.mpesa_config && t.mpesa_config.c2b_registered" style="color:var(--green);font-weight:800">✓ Registered</span>
+                <span v-if="t.mpesa_config && t.mpesa_config.c2b_registered" style="color:var(--green);font-weight:800"><i class="ti ti-check" aria-hidden="true"></i> Registered</span>
                 <span v-else-if="t.mpesa_config" style="color:var(--amber);font-weight:800">⏳ Pending</span>
                 <span v-else style="color:var(--slate-light)">—</span>
               </td>
@@ -48,7 +48,7 @@
                 <span v-else class="rv-badge rv-bgy">Not set up</span>
               </td>
               <td>
-                <button class="rv-btn rv-btn-s rv-btn-xs" @click="$emit('open-client', t)">Configure →</button>
+                <button class="rv-btn rv-btn-s rv-btn-xs" @click="$emit('open-client', t)">Configure <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
               </td>
             </tr>
             <tr v-if="tenants.length===0">

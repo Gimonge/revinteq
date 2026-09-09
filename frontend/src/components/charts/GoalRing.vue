@@ -66,9 +66,9 @@ const statusClass = computed(() => ({
 }))
 
 const statusLabel = computed(() => ({
-  AHEAD:    '🚀 Ahead',
-  ON_TRACK: '✅ On Track',
-  BEHIND:   '⚠️ Behind',
+  AHEAD:    'Ahead',
+  ON_TRACK: 'On Track',
+  BEHIND:   'Behind',
   NO_GOAL:  'No Goal Set',
 }[props.status] || '—'))
 </script>

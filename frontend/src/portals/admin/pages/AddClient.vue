@@ -11,7 +11,7 @@
       <div class="rv-ch"><div class="rv-ct">Client Details</div></div>
       <div class="rv-cb">
         <div v-if="error"   class="rv-al rv-al-r" style="margin-bottom:16px">{{ error }}</div>
-        <div v-if="success" class="rv-al rv-al-g" style="margin-bottom:16px">✅ {{ success }}</div>
+        <div v-if="success" class="rv-al rv-al-g" style="margin-bottom:16px"><i class="ti ti-circle-check" aria-hidden="true"></i> {{ success }}</div>
 
         <!-- Business Info -->
         <div class="rv-sec-lbl">Business Information</div>
@@ -62,7 +62,7 @@
         <!-- Client Login Credentials -->
         <div class="rv-sec-lbl" style="margin-top:8px">Client Portal Access</div>
         <div class="rv-al rv-al-b" style="margin-bottom:16px">
-          🔐 Set login credentials so the client can access their portal immediately. Leave blank to invite them later via the Client Detail page.
+          <i class="ti ti-lock" aria-hidden="true"></i> Set login credentials so the client can access their portal immediately. Leave blank to invite them later via the Client Detail page.
         </div>
         <div class="rv-g2">
           <div class="rv-fg">
@@ -82,7 +82,7 @@
                 @click="showPassword=!showPassword"
                 type="button"
                 style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--slate-light);font-size:15px">
-                {{ showPassword ? '🙈' : '👁️' }}
+                <i :class="['ti', showPassword ? 'ti-eye-off' : 'ti-eye']" aria-hidden="true"></i>
               </button>
             </div>
           </div>
@@ -99,7 +99,7 @@
         <div style="display:flex;gap:12px;margin-top:20px">
           <button class="rv-btn rv-btn-p" @click="create" :disabled="saving">
             <span v-if="saving" class="rv-spin" style="width:14px;height:14px;border-width:2px"></span>
-            <span v-else>✅ Create Client Account</span>
+            <span v-else><i class="ti ti-circle-check" aria-hidden="true"></i> Create Client Account</span>
           </button>
           <button class="rv-btn rv-btn-s" @click="$emit('nav','clients')">Cancel</button>
         </div>

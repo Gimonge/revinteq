@@ -2,13 +2,13 @@
   <div style="display:flex;flex-direction:column;gap:18px">
     <div style="display:flex;align-items:flex-start;justify-content:space-between" class="fade-up">
       <div><div style="font-size:21px;font-weight:900;letter-spacing:-.4px">Customers</div><div style="font-size:13px;color:var(--slate-light);font-weight:600;margin-top:3px">{{ customers.length }} customers in your CRM</div></div>
-      <input v-model="search" class="rv-fi" placeholder="🔍 Search customers..." style="width:220px;padding:7px 12px;font-size:12.5px">
+      <input v-model="search" class="rv-fi" placeholder="Search customers..." style="width:220px;padding:7px 12px;font-size:12.5px">
     </div>
 
     <div class="rv-card card-reveal">
       <div v-if="loading" style="padding:40px;text-align:center"><span class="rv-spin"></span></div>
       <div v-else-if="filtered.length===0" class="rv-empty">
-        <div class="rv-empty-icon">👥</div>
+        <div class="rv-empty-icon"><i class="ti ti-users" aria-hidden="true"></i></div>
         <div class="rv-empty-title">{{ search ? 'No customers found' : 'No customers yet' }}</div>
         <div class="rv-empty-sub">{{ search ? 'Try a different search' : 'Customers appear automatically when sales are logged' }}</div>
       </div>
@@ -31,11 +31,11 @@
               <td>{{ c.total_purchases||0 }}</td>
               <td><strong>{{ fmtK(c.total_spend) }}</strong></td>
               <td>{{ formatDate(c.last_contact_date) }}</td>
-              <td><span class="rv-badge" :class="c.sms_opt_in?'rv-bg':'rv-bgy'">{{ c.sms_opt_in?'✓ In':'Opt-out' }}</span></td>
+              <td><span class="rv-badge" :class="c.sms_opt_in?'rv-bg':'rv-bgy'"><i v-if="c.sms_opt_in" class="ti ti-check" aria-hidden="true"></i> {{ c.sms_opt_in?'In':'Opt-out' }}</span></td>
               <td @click.stop>
                 <div style="display:flex;gap:4px">
-                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openEdit(c)">✏️</button>
-                  <button class="rv-btn rv-btn-d rv-btn-xs" @click="deleteCustomer(c)">🗑️</button>
+                  <button class="rv-btn rv-btn-b rv-btn-xs" @click="openEdit(c)"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+                  <button class="rv-btn rv-btn-d rv-btn-xs" @click="deleteCustomer(c)"><i class="ti ti-trash" aria-hidden="true"></i></button>
                 </div>
               </td>
             </tr>
@@ -49,7 +49,7 @@
     <div class="rv-card" style="width:100%;max-width:480px">
       <div class="rv-ch">
         <div class="rv-ct">Edit Customer</div>
-        <button @click="editCustomer=null" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--slate-light)">✕</button>
+        <button @click="editCustomer=null" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--slate-light)"><i class="ti ti-x" aria-hidden="true"></i></button>
       </div>
       <div class="rv-cb" style="display:flex;flex-direction:column;gap:12px">
         <div class="rv-fg" style="margin:0"><label class="rv-fl">Name</label><input v-model="editForm.name" class="rv-fi"></div>
@@ -63,7 +63,7 @@
         <div style="display:flex;gap:8px;margin-top:4px">
           <button class="rv-btn rv-btn-p" @click="saveEdit" :disabled="saving">
             <span v-if="saving" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
-            <span v-else>💾 Save</span>
+            <span v-else><i class="ti ti-device-floppy" aria-hidden="true"></i> Save</span>
           </button>
           <button class="rv-btn rv-btn-s" @click="editCustomer=null">Cancel</button>
         </div>

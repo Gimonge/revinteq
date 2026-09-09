@@ -41,7 +41,7 @@
         class="flex-shrink-0 flex items-center gap-1.5 bg-green text-white text-[11px] font-black px-2.5 py-1.5 rounded-md hover:bg-green-dark transition-colors"
         :class="copied ? 'bg-green-dark' : ''"
       >
-        <span>{{ copied ? '✓ Copied' : '📋 Copy' }}</span>
+        <span><i :class="['ti', copied ? 'ti-check' : 'ti-clipboard-list']" aria-hidden="true"></i> {{ copied ? 'Copied' : 'Copy' }}</span>
       </button>
     </div>
 
@@ -51,7 +51,7 @@
         @click.stop="$emit('sendInstructions', deal)"
         class="w-full text-[11px] font-bold text-slate-mid border border-border rounded-md py-1.5 hover:bg-surface transition-colors"
       >
-        📤 Send Payment Instructions
+        <i class="ti ti-upload" aria-hidden="true"></i> Send Payment Instructions
       </button>
     </div>
 
@@ -61,7 +61,7 @@
         class="inline-flex items-center text-[10px] font-black px-2 py-0.5 rounded-full"
         :class="velocityClass"
       >
-        {{ velocityLabel }}
+        <i :class="['ti', velocityIcon]" :style="{color: velocityIconColor}" aria-hidden="true"></i> {{ velocityLabel }}
       </span>
       <span v-if="deal.days_in_current_stage > 0" class="text-[10px] text-slate-light font-semibold">
         {{ deal.days_in_current_stage }}d here
@@ -74,13 +74,13 @@
         @click.stop="$emit('quickWon', deal)"
         class="flex-1 text-[11px] font-black bg-green text-white rounded-md py-1.5 hover:bg-green-dark transition-colors shadow-green"
       >
-        ✅ Won
+        <i class="ti ti-circle-check" aria-hidden="true"></i> Won
       </button>
       <button
         @click.stop="$emit('quickLost', deal)"
         class="flex-1 text-[11px] font-black bg-red-light text-red-500 rounded-md py-1.5 hover:bg-red-500 hover:text-white transition-colors"
       >
-        ✗ Lost
+        <i class="ti ti-x" aria-hidden="true"></i> Lost
       </button>
     </div>
   </div>
@@ -120,10 +120,14 @@ const velocityClass = computed(() => ({
   'bg-blue-light text-blue':   props.deal.velocity === 'cold',
 }))
 
+const velocityIcon = computed(() => ({
+  hot: 'ti-flame', warm: 'ti-circle-filled', cold: 'ti-snowflake',
+}[props.deal.velocity] || ''))
+const velocityIconColor = computed(() => ({
+  hot: '#dc2626', warm: '#d97706', cold: '#2563eb',
+}[props.deal.velocity] || ''))
 const velocityLabel = computed(() => ({
-  hot:  '🔥 Hot',
-  warm: '🟡 Warm',
-  cold: '❄️ Cold',
+  hot: 'Hot', warm: 'Warm', cold: 'Cold',
 }[props.deal.velocity] || '—'))
 
 const relativeTime = computed(() => {

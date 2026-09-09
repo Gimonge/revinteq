@@ -24,7 +24,7 @@
               <div class="flex items-center justify-between gap-3">
                 <div class="text-[22px] font-black text-green tracking-widest">{{ deal.mpesa_reference }}</div>
                 <button @click="copyRef" class="flex items-center gap-1.5 bg-green text-white text-xs font-black px-3 py-2 rounded-lg hover:bg-green-dark transition-colors">
-                  {{ refCopied ? '✓ Copied!' : '📋 Copy' }}
+                  <i :class="['ti', refCopied ? 'ti-check' : 'ti-clipboard-list']" aria-hidden="true"></i> {{ refCopied ? 'Copied!' : 'Copy' }}
                 </button>
               </div>
               <div class="text-[11px] text-green/70 font-semibold mt-2">
@@ -34,16 +34,16 @@
 
             <!-- Payment instructions generator -->
             <div class="border border-border rounded-xl p-4">
-              <div class="text-[11px] font-black text-slate-mid uppercase tracking-wide mb-2.5">📤 Send Payment Instructions</div>
+              <div class="text-[11px] font-black text-slate-mid uppercase tracking-wide mb-2.5"><i class="ti ti-upload" aria-hidden="true"></i> Send Payment Instructions</div>
               <div class="bg-surface rounded-lg p-3 text-[12.5px] text-slate leading-relaxed mb-3 font-semibold">
                 {{ paymentMessage }}
               </div>
               <div class="flex gap-2">
                 <button @click="copyInstructions" class="flex-1 text-xs font-black bg-slate text-white py-2 rounded-lg hover:bg-slate/80 transition-colors">
-                  {{ instrCopied ? '✓ Copied!' : '📋 Copy Message' }}
+                  <i :class="['ti', instrCopied ? 'ti-check' : 'ti-clipboard-list']" aria-hidden="true"></i> {{ instrCopied ? 'Copied!' : 'Copy Message' }}
                 </button>
                 <button @click="whatsappShare" class="flex-1 text-xs font-black bg-green text-white py-2 rounded-lg hover:bg-green-dark transition-colors">
-                  💬 WhatsApp
+                  <i class="ti ti-message-circle" aria-hidden="true"></i> WhatsApp
                 </button>
               </div>
             </div>
@@ -52,11 +52,11 @@
             <div>
               <label class="block text-[11px] font-black text-slate-mid uppercase tracking-wide mb-2">Action</label>
               <select v-model="action" class="rv-input">
-                <option value="won">✅ Mark as Won</option>
-                <option value="lost">❌ Mark as Lost</option>
-                <option value="contacted">📞 Move to Contacted</option>
-                <option value="interested">💡 Move to Interested</option>
-                <option value="negotiating">🤝 Move to Negotiating</option>
+                <option value="won">Mark as Won</option>
+                <option value="lost">Mark as Lost</option>
+                <option value="contacted">Move to Contacted</option>
+                <option value="interested">Move to Interested</option>
+                <option value="negotiating">Move to Negotiating</option>
               </select>
             </div>
 
@@ -69,7 +69,7 @@
             <!-- Inline sale log when marking Won -->
             <div v-if="action === 'won'" class="bg-green-light border border-green/20 rounded-xl p-4 space-y-3">
               <div class="flex items-center justify-between">
-                <div class="text-[12px] font-black text-green">💰 Log the Sale Now</div>
+                <div class="text-[12px] font-black text-green"><i class="ti ti-currency-dollar" aria-hidden="true"></i> Log the Sale Now</div>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" v-model="logSale" class="accent-green">
                   <span class="text-[12px] font-bold text-slate-mid">Log sale</span>
@@ -178,7 +178,7 @@ const paymentMessage = computed(() => {
   const ref  = props.deal.mpesa_reference || '—'
   const till = props.shortcode || 'our till'
   const amt  = saleAmount.value ? ` KES ${Number(saleAmount.value).toLocaleString()}` : ''
-  return `Hi! To complete your order, please pay${amt} to ${till}.\nAccount/Reference: ${ref}\n\nOnce paid, we'll confirm immediately. Thank you! 😊`
+  return `Hi! To complete your order, please pay${amt} to ${till}.\nAccount/Reference: ${ref}\n\nOnce paid, we'll confirm immediately. Thank you! <i class="ti ti-mood-smile" aria-hidden="true"></i>`
 })
 
 async function submit() {

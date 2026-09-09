@@ -13,7 +13,7 @@
     <div class="rv-card card-reveal">
       <div class="rv-ch">
         <span class="rv-ct">Filters</span>
-        <button v-if="isCustomRange||filterPlatform" class="rv-btn rv-btn-s rv-btn-xs" @click="clearAll">✕ Reset</button>
+        <button v-if="isCustomRange||filterPlatform" class="rv-btn rv-btn-s rv-btn-xs" @click="clearAll"><i class="ti ti-x" aria-hidden="true"></i> Reset</button>
       </div>
       <div class="rv-cb" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -110,7 +110,7 @@
           <span class="rv-ct">Ad Performance</span>
           <div class="rv-cst">{{ filteredAds.length }} ads{{ filterPlatform ? ' on '+filterPlatform : '' }}</div>
         </div>
-        <button class="rv-btn rv-btn-s rv-btn-sm" @click="loadData" :disabled="loading">↻ Sync</button>
+        <button class="rv-btn rv-btn-s rv-btn-sm" @click="loadData" :disabled="loading"><i class="ti ti-refresh" aria-hidden="true"></i> Sync</button>
       </div>
       <div v-if="loading && !initialLoaded" style="padding:32px;text-align:center"><span class="rv-spin"></span></div>
       <div v-else class="rv-tw">

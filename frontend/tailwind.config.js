@@ -2,7 +2,7 @@ export default {
   content: ['./index.html','./admin.html','./src/**/*.{vue,js}'],
   theme: {
     extend: {
-      fontFamily: { sans: ['Nunito','sans-serif'] },
+      fontFamily: { sans: ['Inter','sans-serif'] },
       colors: {
         green:  { DEFAULT:'#1F7A4C', dark:'#155c38', light:'#E8F5EE', mid:'#2d9e65' },
         blue:   { DEFAULT:'#2563EB', dark:'#1d4ed8', light:'#EFF6FF' },

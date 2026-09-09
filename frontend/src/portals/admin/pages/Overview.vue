@@ -13,31 +13,31 @@
         <div class="rv-page-title">Admin Dashboard</div>
         <div class="rv-page-sub">Cross-client overview — all tenants at a glance</div>
       </div>
-      <button class="rv-btn rv-btn-p" @click="$emit('nav','add-client')">➕ Add New Client</button>
+      <button class="rv-btn rv-btn-p" @click="$emit('nav','add-client')"><i class="ti ti-plus" aria-hidden="true"></i> Add New Client</button>
     </div>
 
     <!-- Stat grid -->
     <div class="rv-stat-grid">
       <div class="rv-sc card-reveal" style="animation-delay:.05s">
-        <span class="rv-sc-icon">🏢</span>
+        <span class="rv-sc-icon"><i class="ti ti-building" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Total Clients</div>
         <div class="rv-sc-value count-up">{{ stats.total }}</div>
         <div class="rv-sc-sub">{{ stats.active }} active &bull; {{ stats.trial }} trial</div>
       </div>
       <div class="rv-sc b card-reveal" style="animation-delay:.1s">
-        <span class="rv-sc-icon">💰</span>
+        <span class="rv-sc-icon"><i class="ti ti-currency-dollar" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Monthly Revenue (All)</div>
         <div class="rv-sc-value count-up">{{ fmt(stats.revenue) }}</div>
         <div class="rv-sc-sub">Across all clients this month</div>
       </div>
       <div class="rv-sc a card-reveal" style="animation-delay:.15s">
-        <span class="rv-sc-icon">🎯</span>
+        <span class="rv-sc-icon"><i class="ti ti-target" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Open Pipeline Deals</div>
         <div class="rv-sc-value count-up">{{ stats.openDeals }}</div>
         <div class="rv-sc-sub">Across all clients</div>
       </div>
       <div class="rv-sc p card-reveal" style="animation-delay:.2s">
-        <span class="rv-sc-icon">🏆</span>
+        <span class="rv-sc-icon"><i class="ti ti-trophy" aria-hidden="true"></i></span>
         <div class="rv-sc-label">Clients on Track / Ahead</div>
         <div class="rv-sc-value count-up">{{ stats.onTrack }}</div>
         <div class="rv-sc-sub">of {{ stats.withGoal }} clients with goals set</div>
@@ -51,11 +51,11 @@
           <div class="rv-ct">Client Performance — This Month</div>
           <div class="rv-cst">Click a row to open client detail</div>
         </div>
-        <button class="rv-btn rv-btn-s rv-btn-sm" @click="loadData">↻ Refresh</button>
+        <button class="rv-btn rv-btn-s rv-btn-sm" @click="loadData"><i class="ti ti-refresh" aria-hidden="true"></i> Refresh</button>
       </div>
       <div v-if="loading" style="padding:40px;text-align:center"><span class="rv-spin"></span></div>
       <div v-else-if="tenants.length===0" class="rv-empty">
-        <div class="rv-empty-icon">🏢</div>
+        <div class="rv-empty-icon"><i class="ti ti-building" aria-hidden="true"></i></div>
         <div class="rv-empty-title">No clients yet</div>
         <div class="rv-empty-sub">Add your first client to get started</div>
       </div>
@@ -104,7 +104,7 @@
               <td>{{ t.last_sale || '—' }}</td>
               <td style="display:flex;gap:6px;white-space:nowrap" @click.stop>
                 <button class="rv-btn rv-btn-s rv-btn-xs" @click="openClient(t)">View</button>
-                <button class="rv-btn rv-btn-a rv-btn-xs" @click="$emit('impersonate',t)">👁️ Act as</button>
+                <button class="rv-btn rv-btn-a rv-btn-xs" @click="$emit('impersonate',t)"><i class="ti ti-eye" aria-hidden="true"></i> Act as</button>
               </td>
             </tr>
           </tbody>
@@ -181,7 +181,7 @@ async function loadData() {
 function openClient(t) { emit('open-client', t) }
 function statusBadge(s) { return {'active':'rv-bg','trial':'rv-bb','suspended':'rv-ba','inactive':'rv-bgy'}[s]||'rv-bgy' }
 function goalBadge(s)   { return {'ahead':'rv-bg','on_track':'rv-bb','behind':'rv-ba','no_goal':'rv-bgy'}[s]||'rv-bgy' }
-function goalLabel(s)   { return {'ahead':'🚀 Ahead','on_track':'✅ On Track','behind':'⚠️ Behind','no_goal':'—'}[s]||'—' }
+function goalLabel(s)   { return {'ahead':'Ahead','on_track':'On Track','behind':'Behind','no_goal':'—'}[s]||'—' }
 function goalColor(s)   { return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)','no_goal':'var(--slate-light)'}[s]||'var(--slate-light)' }
 function goalBarColor(s){ return {'ahead':'var(--green)','on_track':'var(--blue)','behind':'var(--amber)','no_goal':'var(--border-mid)'}[s]||'var(--border-mid)' }
 
