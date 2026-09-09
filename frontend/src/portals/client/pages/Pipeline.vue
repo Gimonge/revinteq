@@ -29,7 +29,7 @@
         <table class="rv-table">
           <thead>
             <tr>
-              <th>Customer</th><th>Platform</th><th>Ad / Campaign</th>
+              <th>Customer</th><th>Platform</th><th>Channel</th><th>Ad / Campaign</th>
               <th>Clicked</th><th>Velocity</th><th>Status</th>
             </tr>
           </thead>
@@ -39,6 +39,7 @@
               <td>
                 <span :style="deal.platform==='instagram'?igStyle:''"><i :class="['ti', platformIcon(deal.platform)]" aria-hidden="true"></i> {{ deal.platform==='instagram'?'Instagram':'Facebook' }}</span>
               </td>
+              <td><i :class="['ti', channelIcon(deal.source)]" aria-hidden="true"></i> {{ channelLabel(deal.source) }}</td>
               <td>{{ deal.ad_name || '—' }}<div v-if="deal.campaign_name" style="font-size:11px;color:var(--slate-light);font-weight:600">{{ deal.campaign_name }}</div></td>
               <td style="white-space:nowrap">{{ timeAgo(deal.new_click_at || deal.created_at) }}</td>
               <td><span class="rv-d-vel" :class="velClass(deal.velocity)" style="margin-top:0"><i :class="['ti', velIcon(deal.velocity)]" :style="{color: velColor(deal.velocity)}" aria-hidden="true"></i> {{ deal.velocity }}</span></td>
@@ -76,6 +77,12 @@ const summary  = computed(() => ({
 
 const igStyle = 'background:linear-gradient(135deg,var(--ig1),var(--ig3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800'
 function platformIcon(p) { return p==='instagram'?'ti-brand-instagram':'ti-brand-facebook' }
+function channelLabel(source) {
+  return {'whatsapp_webhook':'WhatsApp','messenger_webhook':'Messenger','instagram_webhook':'Instagram DM'}[source] || '—'
+}
+function channelIcon(source) {
+  return {'whatsapp_webhook':'ti-brand-whatsapp','messenger_webhook':'ti-brand-messenger','instagram_webhook':'ti-brand-instagram'}[source] || 'ti-message-circle'
+}
 function velClass(v) { return v==='hot'?'vel-hot':v==='warm'?'vel-warm':'vel-cold' }
 function velIcon(v)  { return v==='hot'?'ti-flame':v==='warm'?'ti-circle-filled':'ti-snowflake' }
 function velColor(v) { return v==='warm'?'#d97706':v==='hot'?'#dc2626':'#2563eb' }
