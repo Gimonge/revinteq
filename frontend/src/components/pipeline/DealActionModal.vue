@@ -66,44 +66,9 @@
               <input v-model="lostReason" class="rv-input" placeholder="e.g. Price too high, bought elsewhere">
             </div>
 
-            <!-- Inline sale log when marking Won -->
-            <div v-if="action === 'won'" class="bg-green-light border border-green/20 rounded-xl p-4 space-y-3">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] font-black text-green"><i class="ti ti-currency-dollar" aria-hidden="true"></i> Log the Sale Now</div>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" v-model="logSale" class="accent-green">
-                  <span class="text-[12px] font-bold text-slate-mid">Log sale</span>
-                </label>
-              </div>
-              <div v-if="logSale" class="space-y-3">
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="rv-label">Amount ({{ auth.currency }}) *</label>
-                    <input v-model="saleAmount" type="number" class="rv-input" placeholder="0">
-                  </div>
-                  <div>
-                    <label class="rv-label">Product Name</label>
-                    <input v-model="saleProduct" class="rv-input" placeholder="What was sold?">
-                  </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="rv-label">Payment Method</label>
-                    <select v-model="paymentMethod" class="rv-input">
-                      <option value="mpesa_auto">M-Pesa (auto-matched)</option>
-                      <option value="mpesa_manual">M-Pesa (manual)</option>
-                      <option value="cash">Cash</option>
-                      <option value="bank_deposit">Bank Deposit</option>
-                      <option value="cheque">Cheque</option>
-                      <option value="card">Card</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="rv-label">Payment Reference</label>
-                    <input v-model="paymentRef" class="rv-input" placeholder="Optional">
-                  </div>
-                </div>
-              </div>
+            <!-- Won note -->
+            <div v-if="action === 'won'" class="bg-green-light border border-green/20 rounded-xl p-4">
+              <div class="text-[12px] font-black text-green"><i class="ti ti-circle-check" aria-hidden="true"></i> The sale will sync automatically once this deal is marked Won in Kommo too.</div>
             </div>
 
             <!-- Notes -->
@@ -149,11 +114,7 @@ const ui      = useUIStore()
 const action        = ref('won')
 const lostReason    = ref('')
 const notes         = ref('')
-const logSale       = ref(true)
 const saleAmount    = ref('')
-const saleProduct   = ref('')
-const paymentMethod = ref('mpesa_manual')
-const paymentRef    = ref('')
 const loading       = ref(false)
 const error         = ref('')
 const refCopied     = ref(false)
@@ -165,11 +126,7 @@ watch(() => props.deal, (d) => {
   action.value     = 'won'
   lostReason.value = ''
   notes.value      = ''
-  logSale.value    = true
   saleAmount.value = d.estimated_value || ''
-  saleProduct.value= ''
-  paymentMethod.value = 'mpesa_manual'
-  paymentRef.value = ''
   error.value      = ''
 })
 
@@ -191,13 +148,6 @@ async function submit() {
     if (isSimple) {
       body.action = action.value
       if (action.value === 'lost') body.lost_reason = lostReason.value
-      if (action.value === 'won' && logSale.value && saleAmount.value) {
-        body.log_sale       = true
-        body.amount         = saleAmount.value
-        body.product_name   = saleProduct.value || 'Sale'
-        body.payment_method = paymentMethod.value
-        body.payment_reference = paymentRef.value
-      }
       await pipelineApi.action(props.deal.id, body)
     } else {
       body.stage = action.value

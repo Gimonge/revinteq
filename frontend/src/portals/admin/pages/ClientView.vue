@@ -15,7 +15,6 @@
     <!-- Render the appropriate client page -->
     <Dashboard     v-if="activeTab==='dashboard'"  />
     <Pipeline      v-if="activeTab==='pipeline'"   />
-    <LogSale       v-if="activeTab==='log-sale'"   />
     <SalesHistory  v-if="activeTab==='sales'"      />
     <Customers     v-if="activeTab==='customers'"  />
     <RevenueGoals  v-if="activeTab==='goals'"      />
@@ -29,7 +28,6 @@
 import { ref } from 'vue'
 import Dashboard    from '@/portals/client/pages/Dashboard.vue'
 import Pipeline     from '@/portals/client/pages/Pipeline.vue'
-import LogSale      from '@/portals/client/pages/LogSale.vue'
 import SalesHistory from '@/portals/client/pages/SalesHistory.vue'
 import Customers    from '@/portals/client/pages/Customers.vue'
 import RevenueGoals from '@/portals/client/pages/RevenueGoals.vue'
@@ -45,7 +43,6 @@ const activeTab = ref('dashboard')
 const tabs = [
   { key: 'dashboard',  icon: 'ti-chart-bar',       label: 'Dashboard' },
   { key: 'pipeline',   icon: 'ti-flame',           label: 'Pipeline' },
-  { key: 'log-sale',   icon: 'ti-currency-dollar', label: 'Log Sale' },
   { key: 'sales',      icon: 'ti-clipboard-list',  label: 'Sales History' },
   { key: 'customers',  icon: 'ti-users',           label: 'Customers' },
   { key: 'goals',      icon: 'ti-target',          label: 'Revenue Goals' },

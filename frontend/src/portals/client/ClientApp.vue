@@ -33,7 +33,6 @@
         <Dashboard    v-if="page==='dashboard'"  @nav="navigate" @toast="showToast" />
         <Analytics    v-if="page==='analytics'"  @nav="navigate" @toast="showToast" />
         <Pipeline     v-if="page==='pipeline'"   @nav="navigate" @toast="showToast" />
-        <LogSale      v-if="page==='log'"         @nav="navigate" @toast="showToast" />
         <SalesHistory v-if="page==='history'"    @nav="navigate" @toast="showToast" />
         <BulkUpload   v-if="page==='bulk'"        @nav="navigate" @toast="showToast" />
         <FacebookAds  v-if="page==='facebook'"   @nav="navigate" @toast="showToast" />
@@ -56,7 +55,6 @@ import ClientLogin  from './pages/Login.vue'
 import Dashboard    from './pages/Dashboard.vue'
 import Analytics    from './pages/Analytics.vue'
 import Pipeline     from './pages/Pipeline.vue'
-import LogSale      from './pages/LogSale.vue'
 import SalesHistory from './pages/SalesHistory.vue'
 import BulkUpload   from './pages/BulkUpload.vue'
 import FacebookAds  from './pages/FacebookAds.vue'

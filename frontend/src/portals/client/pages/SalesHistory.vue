@@ -16,7 +16,6 @@
           <span v-if="exporting" class="rv-spin" style="width:12px;height:12px;border-width:2px"></span>
           <span v-else><i class="ti ti-download" aria-hidden="true"></i> Export Excel</span>
         </button>
-        <button class="rv-btn rv-btn-p rv-btn-sm" @click="$emit('nav','log')"><i class="ti ti-pencil" aria-hidden="true"></i> Log Sale</button>
       </div>
     </div>
 

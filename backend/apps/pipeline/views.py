@@ -13,7 +13,7 @@ from apps.common.views import get_tenant
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import (
     ModelSerializer, CharField, SerializerMethodField,
-    DecimalField, FloatField, IntegerField, BooleanField, Serializer,
+    FloatField, IntegerField, BooleanField, Serializer,
     ChoiceField, UUIDField
 )
 from apps.tenants.permissions import IsClientOrAdmin
@@ -58,14 +58,6 @@ class WonLostSerializer(Serializer):
     action = ChoiceField(choices=['won', 'lost'])
     lost_reason = CharField(required=False, allow_blank=True, default='')
     notes = CharField(required=False, allow_blank=True, default='')
-    # When marking Won — optionally log sale details inline
-    log_sale = BooleanField(required=False, default=False)
-    product_name = CharField(required=False, allow_blank=True, default='')
-    amount = DecimalField(
-        max_digits=12, decimal_places=2, required=False, allow_null=True
-    )
-    payment_method = CharField(required=False, allow_blank=True, default='cash')
-    payment_reference = CharField(required=False, allow_blank=True, default='')
 
 
 class PipelineBoardView(APIView):
@@ -253,26 +245,6 @@ class PipelineDealActionView(APIView):
             notes=data.get('notes', ''),
         )
 
-        # Optionally log sale inline when marking Won
-        sale = None
-        if action == 'won' and data.get('log_sale') and data.get('amount'):
-            from apps.sales.models import Sale
-            from datetime import date
-            sale = Sale.objects.create(
-                tenant=get_tenant(request),
-                pipeline_deal=deal,
-                ad=deal.ad,
-                campaign=deal.campaign,
-                product_name=data.get('product_name') or 'Sale',
-                amount=data['amount'],
-                payment_method=data.get('payment_method', 'cash'),
-                payment_reference=data.get('payment_reference', ''),
-                platform_source=deal.platform,
-                sale_date=date.today(),
-                is_confirmed=True,
-                created_by=request.user,
-            )
-
         # Fire webhooks
         from apps.external_api.tasks import dispatch_webhook
         dispatch_webhook.delay(
@@ -284,14 +256,10 @@ class PipelineDealActionView(APIView):
         response_data = PipelineDealSerializer(deal).data
         response_data['action_taken'] = action
 
-        if sale:
-            response_data['sale_logged'] = True
-            response_data['sale_id'] = str(sale.id)
-
-        if action == 'won' and not data.get('log_sale'):
-            response_data['prompt_sale_log'] = True
+        if action == 'won':
             response_data['message'] = (
-                'Deal marked as Won! Log the sale now to update your revenue metrics.'
+                'Deal marked as Won! The sale will sync automatically once '
+                'this deal is marked Won in Kommo too.'
             )
 
         return Response(response_data)

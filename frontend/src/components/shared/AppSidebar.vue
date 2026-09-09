@@ -16,7 +16,6 @@
     <div class="rv-nav-item" :class="{active:page==='pipeline'}"  @click="nav('pipeline')"><span class="rv-nav-icon"><i class="ti ti-target" aria-hidden="true"></i></span>Sales Pipeline</div>
 
     <div class="rv-sb-section">Sales</div>
-    <div class="rv-nav-item" :class="{active:page==='log'}"     @click="nav('log')"><span class="rv-nav-icon"><i class="ti ti-pencil" aria-hidden="true"></i></span>Log a Sale</div>
     <div class="rv-nav-item" :class="{active:page==='history'}" @click="nav('history')"><span class="rv-nav-icon"><i class="ti ti-clipboard-list" aria-hidden="true"></i></span>Sales History</div>
     <div class="rv-nav-item" :class="{active:page==='bulk'}"    @click="nav('bulk')"><span class="rv-nav-icon"><i class="ti ti-upload" aria-hidden="true"></i></span>Bulk Upload</div>
 

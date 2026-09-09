@@ -42,7 +42,7 @@ def compute_totals(queryset) -> dict:
 class SaleListCreateView(APIView):
     """
     GET  /api/v1/sales/   — list sales with totals
-    POST /api/v1/sales/   — log a new sale
+    POST /api/v1/sales/   — retired; sales now sync from Kommo (see apps.kommo_integration)
     """
     permission_classes = [IsAuthenticated, IsClientOrAdmin]
 
@@ -86,30 +86,14 @@ class SaleListCreateView(APIView):
         return response
 
     def post(self, request):
-        serializer = SaleSerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        sale = serializer.save()
-
-        # Create/update customer record
-        try:
-            from apps.customers.models import Customer
-            Customer.get_or_create_from_sale(sale)
-        except Exception as e:
-            import logging
-            logging.getLogger(__name__).warning(f"Customer upsert failed: {e}")
-
-        # Fire webhooks
-        try:
-            from apps.external_api.tasks import dispatch_webhook
-            dispatch_webhook.delay(
-                str(get_tenant(request).id), 'sale.created',
-                {'sale_id': str(sale.id), 'amount': float(sale.amount),
-                 'platform': sale.platform_source}
-            )
-        except Exception:
-            pass
-
-        return Response(SaleSerializer(sale).data, status=status.HTTP_201_CREATED)
+        return Response({
+            'error': True,
+            'message': (
+                'Manual sale logging has been retired. Sales are now synced '
+                'automatically from your connected Kommo account when a deal '
+                'is marked Won — connect Kommo in Settings if you haven\'t already.'
+            ),
+        }, status=status.HTTP_410_GONE)
 
 
 class SaleDetailView(APIView):

@@ -10,7 +10,6 @@ import { useAuthStore } from '@/stores'
 const Dashboard     = () => import('@/portals/client/pages/Dashboard.vue')
 const Analytics     = () => import('@/portals/client/pages/Analytics.vue')
 const Pipeline      = () => import('@/portals/client/pages/Pipeline.vue')
-const LogSale       = () => import('@/portals/client/pages/LogSale.vue')
 const SalesHistory  = () => import('@/portals/client/pages/SalesHistory.vue')
 const BulkUpload    = () => import('@/portals/client/pages/BulkUpload.vue')
 const FacebookAds   = () => import('@/portals/client/pages/FacebookAds.vue')
@@ -38,7 +37,6 @@ const routes = [
   { path: '/',              name: 'dashboard',    component: Dashboard,    meta: { role: 'client' } },
   { path: '/analytics',     name: 'analytics',    component: Analytics,    meta: { role: 'client' } },
   { path: '/pipeline',      name: 'pipeline',     component: Pipeline,     meta: { role: 'client' } },
-  { path: '/log-sale',      name: 'log-sale',     component: LogSale,      meta: { role: 'client' } },
   { path: '/sales',         name: 'sales',        component: SalesHistory, meta: { role: 'client' } },
   { path: '/bulk-upload',   name: 'bulk-upload',  component: BulkUpload,   meta: { role: 'client' } },
   { path: '/facebook-ads',  name: 'facebook-ads', component: FacebookAds,  meta: { role: 'client' } },
