@@ -13,8 +13,9 @@
     <!-- Pipeline summary -->
     <div class="rv-aov card-reveal" style="animation-delay:.1s">
       <div class="rv-aov-cell"><div class="rv-aov-label">Total Clicks</div><div class="rv-aov-value">{{ summary.total }}</div></div>
-      <div class="rv-aov-cell"><div class="rv-aov-label">Hot Leads</div><div class="rv-aov-value">{{ summary.hot }}</div></div>
-      <div class="rv-aov-cell"><div class="rv-aov-label">Synced to Sale</div><div class="rv-aov-value" style="color:var(--green)">{{ summary.synced }}</div></div>
+      <div class="rv-aov-cell"><div class="rv-aov-label">Qualified Hot</div><div class="rv-aov-value" style="color:#dc2626">{{ summary.qualifiedHot }}</div></div>
+      <div class="rv-aov-cell"><div class="rv-aov-label">Closed Won</div><div class="rv-aov-value" style="color:var(--green)">{{ summary.closedWon }}</div></div>
+      <div class="rv-aov-cell"><div class="rv-aov-label">Closed Lost</div><div class="rv-aov-value" style="color:var(--red)">{{ summary.closedLost }}</div></div>
     </div>
 
     <!-- Deal list -->
@@ -64,16 +65,22 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 
 defineEmits(['nav','toast'])
-const deals = ref([])
+const deals  = ref([])
+const funnel = ref({ connected:false, stages:[] })
 const loading = ref(true)
 const platformFilter = ref('')
 
 const filtered = computed(() => platformFilter.value ? deals.value.filter(d=>d.platform===platformFilter.value) : deals.value)
-const summary  = computed(() => ({
-  total:  deals.value.length,
-  hot:    deals.value.filter(d=>d.velocity==='hot').length,
-  synced: deals.value.filter(d=>d.has_sale).length,
-}))
+const summary  = computed(() => {
+  const stages = funnel.value.stages || []
+  const sumMatching = (re) => stages.filter(s=>re.test(s.name)).reduce((a,s)=>a+s.count,0)
+  return {
+    total:       deals.value.length,
+    qualifiedHot: sumMatching(/hot/i),
+    closedWon:    sumMatching(/won/i),
+    closedLost:   sumMatching(/lost/i),
+  }
+})
 
 const igStyle = 'background:linear-gradient(135deg,var(--ig1),var(--ig3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800'
 function platformIcon(p) { return p==='instagram'?'ti-brand-instagram':'ti-brand-facebook' }
@@ -91,6 +98,7 @@ function timeAgo(dt) { return dt ? dayjs(dt).fromNow() : '' }
 async function loadDeals() {
   loading.value = true
   try { const r = await api.get('/pipeline/deals/'); deals.value = r.data.results || r.data || [] } catch(e) {}
+  try { const r = await api.get('/kommo/funnel/'); funnel.value = r.data } catch(e) {}
   loading.value = false
 }
 
