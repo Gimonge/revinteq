@@ -49,6 +49,13 @@ class KommoConnection(models.Model):
     last_synced  = models.DateTimeField(null=True, blank=True)
     last_error   = models.TextField(blank=True, default='')
 
+    # Cache of this tenant's own Kommo pipeline structure — every client
+    # names/orders their stages differently, so we fetch and store it
+    # rather than assuming a fixed set. Refreshed periodically.
+    # Shape: {"<status_id>": {"name": str, "sort": int, "pipeline_id": str, "pipeline_name": str}}
+    pipeline_cache = models.JSONField(default=dict, blank=True)
+    pipeline_cache_updated_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -101,6 +108,14 @@ class KommoMatchedLead(models.Model):
     status        = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     match_method  = models.CharField(max_length=20, choices=MATCH_METHOD_CHOICES, blank=True, default='')
     match_attempts = models.PositiveSmallIntegerField(default=0)
+
+    # The lead's actual current stage in the client's own Kommo pipeline
+    # (e.g. "Qualified HOT", "Discovery Call Booked") — kept up to date by
+    # the sync task independent of `status` above, which only tracks our
+    # own pending/matched/won/lost/unmatched bookkeeping.
+    kommo_status_id    = models.IntegerField(null=True, blank=True)
+    kommo_status_name  = models.CharField(max_length=200, blank=True, default='')
+    kommo_pipeline_id  = models.CharField(max_length=100, blank=True, default='')
 
     won_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     won_at     = models.DateTimeField(null=True, blank=True)

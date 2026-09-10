@@ -11,6 +11,63 @@ from .services.kommo_api import KommoAPIClient, KommoAPIError
 logger = logging.getLogger(__name__)
 
 
+class KommoFunnelView(APIView):
+    """
+    GET /api/v1/kommo/funnel/
+    Count of matched leads currently in each stage of the tenant's own
+    Kommo pipeline (stage names/order come from their pipeline_cache,
+    since every client names their stages differently).
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tenant = get_tenant(request)
+        if not tenant:
+            return Response({'connected': False, 'stages': []})
+
+        try:
+            conn = tenant.kommo_connection
+        except KommoConnection.DoesNotExist:
+            return Response({'connected': False, 'stages': []})
+
+        from django.db.models import Count
+        from .models import KommoMatchedLead
+
+        counts = {
+            row['kommo_status_name']: row['c']
+            for row in KommoMatchedLead.objects
+                .filter(tenant=tenant, kommo_status_name__gt='')
+                .values('kommo_status_name')
+                .annotate(c=Count('id'))
+        }
+
+        # Order by each stage's real position in the tenant's own pipeline
+        ordered = sorted(
+            conn.pipeline_cache.values(),
+            key=lambda s: (s.get('pipeline_id', ''), s.get('sort', 0))
+        )
+        seen = set()
+        stages = []
+        for s in ordered:
+            name = s['name']
+            if name in seen:
+                continue
+            seen.add(name)
+            stages.append({'name': name, 'count': counts.get(name, 0)})
+
+        # Any stage names on leads that aren't in the current cache
+        # (e.g. cache is stale) still get shown, appended at the end
+        for name, count in counts.items():
+            if name not in seen:
+                stages.append({'name': name, 'count': count})
+
+        return Response({
+            'connected': True,
+            'pipeline_cache_updated_at': conn.pipeline_cache_updated_at,
+            'stages': stages,
+        })
+
+
 class KommoConnectManualView(APIView):
     """
     POST /api/v1/kommo/connect/
@@ -48,7 +105,7 @@ class KommoConnectManualView(APIView):
             logger.warning(f"Kommo connect failed for {tenant.name}: {e}")
             return Response({'error': True, 'message': f"Couldn't verify token: {e}"}, status=400)
 
-        KommoConnection.objects.update_or_create(
+        connection, _ = KommoConnection.objects.update_or_create(
             tenant=tenant,
             defaults={
                 'subdomain':    subdomain,
@@ -58,6 +115,13 @@ class KommoConnectManualView(APIView):
             }
         )
         logger.info(f"Kommo connected for {tenant.name} ({subdomain})")
+
+        try:
+            from .services.matching import refresh_pipeline_cache
+            refresh_pipeline_cache(connection, force=True)
+        except Exception as e:
+            logger.warning(f"Could not fetch Kommo pipeline structure for {tenant.name}: {e}")
+
         return Response({'message': 'Kommo connected successfully!', 'subdomain': subdomain})
 
 
@@ -94,9 +158,15 @@ class KommoSyncView(APIView):
             return Response({'error': True, 'message': 'No tenant for this account.'}, status=400)
 
         try:
-            tenant.kommo_connection
+            connection = tenant.kommo_connection
         except KommoConnection.DoesNotExist:
             return Response({'error': True, 'message': 'Kommo is not connected.'}, status=400)
+
+        try:
+            from .services.matching import refresh_pipeline_cache
+            refresh_pipeline_cache(connection, force=True)
+        except Exception as e:
+            logger.warning(f"Pipeline cache refresh failed for {tenant.name}: {e}")
 
         from .tasks import sync_matched_leads_for_tenant
         sync_matched_leads_for_tenant.delay(str(tenant.id))

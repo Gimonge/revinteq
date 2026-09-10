@@ -29,6 +29,45 @@ MATCH_WINDOW_MINUTES = getattr(settings, 'KOMMO_MATCH_WINDOW_MINUTES', 20)
 MAX_MATCH_ATTEMPTS   = getattr(settings, 'KOMMO_MATCH_MAX_RETRIES', 5)
 
 
+def refresh_pipeline_cache(connection, force=False) -> dict:
+    """
+    Fetch and cache this tenant's own Kommo pipeline structure — every
+    client names/orders their stages differently (e.g. "Qualified HOT",
+    "Discovery Call Booked"), so we look it up rather than assume one.
+    Cached for a day unless force=True; the funnel view reads from cache.
+    """
+    if not force and connection.pipeline_cache and connection.pipeline_cache_updated_at:
+        age = timezone.now() - connection.pipeline_cache_updated_at
+        if age < timedelta(hours=24):
+            return connection.pipeline_cache
+
+    client = KommoAPIClient.for_connection(connection)
+    pipelines = client.get_pipelines()
+
+    cache = {}
+    for pipeline in pipelines:
+        statuses = pipeline.get('_embedded', {}).get('statuses', [])
+        for s in statuses:
+            cache[str(s['id'])] = {
+                'name': s.get('name', ''),
+                'sort': s.get('sort', 0),
+                'pipeline_id': str(pipeline.get('id', '')),
+                'pipeline_name': pipeline.get('name', ''),
+            }
+
+    connection.pipeline_cache = cache
+    connection.pipeline_cache_updated_at = timezone.now()
+    connection.save(update_fields=['pipeline_cache', 'pipeline_cache_updated_at'])
+    return cache
+
+
+def _stage_name(connection, status_id) -> str:
+    entry = connection.pipeline_cache.get(str(status_id))
+    if entry:
+        return entry['name']
+    return {WON_STATUS_ID: 'Closed Won', LOST_STATUS_ID: 'Closed Lost'}.get(status_id, f'Status {status_id}')
+
+
 def attempt_match(matched_lead) -> bool:
     """
     Try to find the Kommo lead for one KommoMatchedLead's pipeline_deal.
@@ -100,15 +139,18 @@ def _leads_within_window(leads: list, reference_time, minutes: int) -> list:
     return [l for l in leads if abs(l.get('created_at', 0) - reference_ts) <= window]
 
 
-def check_and_sync_won(matched_lead) -> bool:
+def sync_lead_status(matched_lead) -> bool:
     """
-    For an already-matched lead, check its current Kommo status. If it's
-    now Won, create the Sale. Returns True if a Sale was created this call.
+    For an already-matched lead, refresh its current Kommo stage
+    (kommo_status_id/name — whatever that client calls it, e.g. "Qualified
+    HOT"). If the stage is Won, also create the Sale. Returns True if a
+    Sale was created this call.
     """
     from apps.sales.models import Sale
 
     tenant = matched_lead.tenant
     connection = tenant.kommo_connection
+    refresh_pipeline_cache(connection)
     client = KommoAPIClient.for_connection(connection)
 
     lead = client.get_lead(matched_lead.kommo_lead_id)
@@ -116,16 +158,21 @@ def check_and_sync_won(matched_lead) -> bool:
     matched_lead.last_checked  = timezone.now()
 
     status_id = lead.get('status_id')
+    matched_lead.kommo_status_id   = status_id
+    matched_lead.kommo_status_name = _stage_name(connection, status_id)
+    matched_lead.kommo_pipeline_id = str(lead.get('pipeline_id', ''))
+
     if status_id == LOST_STATUS_ID:
         matched_lead.status = 'lost'
-        matched_lead.save(update_fields=['status', 'raw_lead_data', 'last_checked'])
+        matched_lead.save()
         return False
 
     if status_id != WON_STATUS_ID:
-        matched_lead.save(update_fields=['raw_lead_data', 'last_checked'])
+        matched_lead.save()
         return False
 
     if matched_lead.sale_id:
+        matched_lead.save()
         return False  # already synced
 
     deal   = matched_lead.pipeline_deal

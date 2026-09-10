@@ -42,13 +42,13 @@ def match_pipeline_deal_to_kommo(self, matched_lead_id: str):
 def sync_matched_leads_for_tenant(tenant_id: str):
     """Check every currently-matched (not yet won/lost) lead for status changes."""
     from .models import KommoMatchedLead
-    from .services.matching import check_and_sync_won
+    from .services.matching import sync_lead_status
 
     leads = KommoMatchedLead.objects.filter(tenant_id=tenant_id, status='matched')
     synced = 0
     for lead in leads:
         try:
-            if check_and_sync_won(lead):
+            if sync_lead_status(lead):
                 synced += 1
         except Exception as e:
             logger.warning(f"Kommo sync check failed for {lead.id}: {e}")
@@ -57,10 +57,15 @@ def sync_matched_leads_for_tenant(tenant_id: str):
 
 @shared_task
 def sync_all_kommo_connections():
-    """Nightly — check all tenants' matched leads for won/lost status changes."""
+    """Nightly — refresh pipeline structure and check all tenants' matched leads for stage changes."""
     from .models import KommoConnection
+    from .services.matching import refresh_pipeline_cache
     connections = KommoConnection.objects.filter(sync_enabled=True)
     for conn in connections:
+        try:
+            refresh_pipeline_cache(conn)
+        except Exception as e:
+            logger.warning(f"Pipeline cache refresh failed for {conn.tenant.name}: {e}")
         sync_matched_leads_for_tenant.delay(str(conn.tenant_id))
         conn.last_synced = timezone.now()
         conn.save(update_fields=['last_synced'])

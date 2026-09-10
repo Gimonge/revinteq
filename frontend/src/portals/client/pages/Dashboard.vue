@@ -115,6 +115,20 @@
       </div>
     </div>
 
+    <!-- Kommo Pipeline Funnel -->
+    <div v-if="funnel.connected && funnel.stages.length" class="rv-card card-reveal" style="animation-delay:.45s">
+      <div class="rv-ch"><span class="rv-ct">Sales Funnel — from Kommo</span></div>
+      <div class="rv-cb" style="display:flex;flex-direction:column;gap:8px">
+        <div v-for="s in funnel.stages" :key="s.name" class="rv-c-row">
+          <div class="rv-c-lbl" style="width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" :title="s.name">{{ s.name }}</div>
+          <div class="rv-c-track">
+            <div class="rv-c-bar" :style="{width: funnelWidth(s.count)+'%', background: isClosedWon(s.name) ? 'var(--green)' : isClosedLost(s.name) ? 'var(--red)' : 'var(--blue)'}"></div>
+          </div>
+          <div class="rv-c-val">{{ s.count }}</div>
+        </div>
+      </div>
+    </div>
+
     <div class="rv-g2">
       <!-- 7-day chart -->
       <div class="rv-card card-reveal" style="animation-delay:.3s">
@@ -197,6 +211,7 @@ const dailyRevenue = ref([])
 const coldDeals = ref(0)
 const flashing  = ref(false)
 const waClicks  = ref({ total:0, whatsapp:0, messenger:0, instagram:0, synced_to_sale:0 })
+const funnel    = ref({ connected:false, stages:[] })
 const adSpend   = ref({
   facebook:  { spend:0, impressions:0, clicks:0, dm_conversations:0 },
   instagram: { spend:0, impressions:0, clicks:0, dm_conversations:0 },
@@ -231,6 +246,15 @@ const salesNeeded = computed(() => {
 // fmtNum imported from @/utils/format
 function fmtK(v, cur) {
   return _fmtK(v, cur || auth.tenant?.currency || 'KES')
+}
+
+const funnelMax = computed(() => Math.max(...funnel.value.stages.map(s=>s.count), 1))
+function funnelWidth(count) { return Math.round((count/funnelMax.value)*100) }
+function isClosedWon(name)  { return /won/i.test(name) }
+function isClosedLost(name) { return /lost/i.test(name) }
+
+async function loadFunnel() {
+  try { const r = await api.get('/kommo/funnel/'); funnel.value = r.data } catch(e) {}
 }
 
 async function loadWaClicks() {
@@ -270,6 +294,8 @@ async function loadData() {
       adSpend.value.conversations = r.data.conversations || adSpend.value.conversations
     }
   } catch(e) {}
+  await loadWaClicks()
+  await loadFunnel()
 }
 const { lastUpdated, refreshing } = useAutoRefresh(loadData, 30000)
 </script>
