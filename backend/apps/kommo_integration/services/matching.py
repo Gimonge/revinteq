@@ -68,6 +68,44 @@ def _stage_name(connection, status_id) -> str:
     return {WON_STATUS_ID: 'Closed Won', LOST_STATUS_ID: 'Closed Lost'}.get(status_id, f'Status {status_id}')
 
 
+def refresh_funnel_counts(connection, force=False) -> dict:
+    """
+    Count every lead in the tenant's Kommo account by its current stage —
+    independent of ad-click matching. Used for the funnel so it's useful
+    even before Meta is connected (which is what actually creates the
+    PipelineDeal/KommoMatchedLead records the ad-attributed path relies on).
+    Cached for an hour unless force=True.
+    """
+    if not force and connection.funnel_counts_cache and connection.funnel_counts_updated_at:
+        age = timezone.now() - connection.funnel_counts_updated_at
+        if age < timedelta(hours=1):
+            return connection.funnel_counts_cache
+
+    refresh_pipeline_cache(connection)
+    client = KommoAPIClient.for_connection(connection)
+
+    counts = {}
+    page = 1
+    while True:
+        leads = client.get_leads(page=page, limit=250)
+        if not leads:
+            break
+        for lead in leads:
+            name = _stage_name(connection, lead.get('status_id'))
+            counts[name] = counts.get(name, 0) + 1
+        if len(leads) < 250:
+            break
+        page += 1
+        if page > 40:  # safety cap — 10,000 leads
+            logger.warning(f"Funnel count for {connection.tenant.name} stopped at page cap")
+            break
+
+    connection.funnel_counts_cache = counts
+    connection.funnel_counts_updated_at = timezone.now()
+    connection.save(update_fields=['funnel_counts_cache', 'funnel_counts_updated_at'])
+    return counts
+
+
 def attempt_match(matched_lead) -> bool:
     """
     Try to find the Kommo lead for one KommoMatchedLead's pipeline_deal.

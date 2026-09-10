@@ -14,9 +14,11 @@ logger = logging.getLogger(__name__)
 class KommoFunnelView(APIView):
     """
     GET /api/v1/kommo/funnel/
-    Count of matched leads currently in each stage of the tenant's own
-    Kommo pipeline (stage names/order come from their pipeline_cache,
-    since every client names their stages differently).
+    Count of every lead in the tenant's Kommo account, per stage — pulled
+    from the whole account, independent of ad-click matching (so it's
+    useful even before Meta is connected). Sales/revenue attribution is
+    unaffected by this — that still only happens for leads matched to a
+    real ad click via KommoMatchedLead.
     """
     permission_classes = [IsAuthenticated]
 
@@ -30,16 +32,12 @@ class KommoFunnelView(APIView):
         except KommoConnection.DoesNotExist:
             return Response({'connected': False, 'stages': []})
 
-        from django.db.models import Count
-        from .models import KommoMatchedLead
-
-        counts = {
-            row['kommo_status_name']: row['c']
-            for row in KommoMatchedLead.objects
-                .filter(tenant=tenant, kommo_status_name__gt='')
-                .values('kommo_status_name')
-                .annotate(c=Count('id'))
-        }
+        from .services.matching import refresh_funnel_counts
+        try:
+            counts = refresh_funnel_counts(conn)
+        except Exception as e:
+            logger.warning(f"Funnel fetch failed for {tenant.name}: {e}")
+            counts = conn.funnel_counts_cache
 
         # Order by each stage's real position in the tenant's own pipeline
         ordered = sorted(
@@ -63,7 +61,7 @@ class KommoFunnelView(APIView):
 
         return Response({
             'connected': True,
-            'pipeline_cache_updated_at': conn.pipeline_cache_updated_at,
+            'funnel_updated_at': conn.funnel_counts_updated_at,
             'stages': stages,
         })
 
@@ -117,8 +115,9 @@ class KommoConnectManualView(APIView):
         logger.info(f"Kommo connected for {tenant.name} ({subdomain})")
 
         try:
-            from .services.matching import refresh_pipeline_cache
+            from .services.matching import refresh_pipeline_cache, refresh_funnel_counts
             refresh_pipeline_cache(connection, force=True)
+            refresh_funnel_counts(connection, force=True)
         except Exception as e:
             logger.warning(f"Could not fetch Kommo pipeline structure for {tenant.name}: {e}")
 
@@ -163,8 +162,9 @@ class KommoSyncView(APIView):
             return Response({'error': True, 'message': 'Kommo is not connected.'}, status=400)
 
         try:
-            from .services.matching import refresh_pipeline_cache
+            from .services.matching import refresh_pipeline_cache, refresh_funnel_counts
             refresh_pipeline_cache(connection, force=True)
+            refresh_funnel_counts(connection, force=True)
         except Exception as e:
             logger.warning(f"Pipeline cache refresh failed for {tenant.name}: {e}")
 

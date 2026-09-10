@@ -57,15 +57,16 @@ def sync_matched_leads_for_tenant(tenant_id: str):
 
 @shared_task
 def sync_all_kommo_connections():
-    """Nightly — refresh pipeline structure and check all tenants' matched leads for stage changes."""
+    """Nightly — refresh pipeline structure, funnel counts, and check all tenants' matched leads for stage changes."""
     from .models import KommoConnection
-    from .services.matching import refresh_pipeline_cache
+    from .services.matching import refresh_pipeline_cache, refresh_funnel_counts
     connections = KommoConnection.objects.filter(sync_enabled=True)
     for conn in connections:
         try:
             refresh_pipeline_cache(conn)
+            refresh_funnel_counts(conn, force=True)
         except Exception as e:
-            logger.warning(f"Pipeline cache refresh failed for {conn.tenant.name}: {e}")
+            logger.warning(f"Kommo cache refresh failed for {conn.tenant.name}: {e}")
         sync_matched_leads_for_tenant.delay(str(conn.tenant_id))
         conn.last_synced = timezone.now()
         conn.save(update_fields=['last_synced'])

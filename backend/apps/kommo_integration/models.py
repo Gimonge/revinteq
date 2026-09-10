@@ -56,6 +56,13 @@ class KommoConnection(models.Model):
     pipeline_cache = models.JSONField(default=dict, blank=True)
     pipeline_cache_updated_at = models.DateTimeField(null=True, blank=True)
 
+    # Total lead count per stage across the WHOLE Kommo account, independent
+    # of ad-click matching (used for the funnel when Meta isn't connected
+    # yet, or just to show the full picture regardless of attribution).
+    # Shape: {"<stage_name>": count}
+    funnel_counts_cache = models.JSONField(default=dict, blank=True)
+    funnel_counts_updated_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
