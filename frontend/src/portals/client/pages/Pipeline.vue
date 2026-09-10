@@ -20,9 +20,21 @@
 
     <!-- All Kommo Leads (raw, not tied to an ad click) -->
     <div v-if="kommoLeads.connected" class="rv-card card-reveal" style="animation-delay:.2s">
-      <div class="rv-ch"><span class="rv-ct">All Kommo Leads</span></div>
-      <div v-if="kommoLeads.results.length===0" class="rv-empty">
-        <div style="font-weight:800;margin-top:8px">No leads in Kommo yet</div>
+      <div class="rv-ch" style="display:flex;align-items:center;justify-content:space-between">
+        <span class="rv-ct">All Kommo Leads</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="rv-btn rv-btn-s rv-btn-sm" @click="kommoPage=Math.max(1,kommoPage-1); loadKommoLeads()" :disabled="kommoPage<=1 || kommoLeadsLoading">
+            <i class="ti ti-chevron-left" aria-hidden="true"></i>
+          </button>
+          <span style="font-size:12px;font-weight:700;color:var(--slate-light)">Page {{ kommoPage }}</span>
+          <button class="rv-btn rv-btn-s rv-btn-sm" @click="kommoPage++; loadKommoLeads()" :disabled="kommoLeads.results.length<15 || kommoLeadsLoading">
+            <i class="ti ti-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <div v-if="kommoLeadsLoading" style="padding:30px;text-align:center"><span class="rv-spin"></span></div>
+      <div v-else-if="kommoLeads.results.length===0" class="rv-empty">
+        <div style="font-weight:800;margin-top:8px">No leads on this page</div>
       </div>
       <div v-else class="rv-tw">
         <table class="rv-table">
@@ -92,6 +104,8 @@ defineEmits(['nav','toast'])
 const deals  = ref([])
 const funnel = ref({ connected:false, stages:[] })
 const kommoLeads = ref({ connected:false, results:[] })
+const kommoPage = ref(1)
+const kommoLeadsLoading = ref(false)
 const loading = ref(true)
 const platformFilter = ref('')
 
@@ -122,12 +136,18 @@ function timeAgo(dt) { return dt ? dayjs(dt).fromNow() : '' }
 function isClosedWon(name)  { return /won/i.test(name || '') }
 function isClosedLost(name) { return /lost/i.test(name || '') }
 
+async function loadKommoLeads() {
+  kommoLeadsLoading.value = true
+  try { const r = await api.get(`/kommo/leads/?limit=15&page=${kommoPage.value}`); kommoLeads.value = r.data } catch(e) {}
+  kommoLeadsLoading.value = false
+}
+
 async function loadDeals() {
   loading.value = true
   try { const r = await api.get('/pipeline/deals/'); deals.value = r.data.results || r.data || [] } catch(e) {}
   try { const r = await api.get('/kommo/funnel/'); funnel.value = r.data } catch(e) {}
-  try { const r = await api.get('/kommo/leads/?limit=100'); kommoLeads.value = r.data } catch(e) {}
   loading.value = false
+  await loadKommoLeads()
 }
 
 useAutoRefresh(loadDeals, 45000)
