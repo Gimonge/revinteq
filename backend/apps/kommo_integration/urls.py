@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     KommoConnectManualView, KommoConnectionStatusView,
-    KommoSyncView, KommoDisconnectView, KommoFunnelView,
+    KommoSyncView, KommoDisconnectView, KommoFunnelView, KommoLeadsListView,
 )
 
 urlpatterns = [
@@ -10,4 +10,5 @@ urlpatterns = [
     path('sync/',       KommoSyncView.as_view(),             name='kommo-sync'),
     path('disconnect/', KommoDisconnectView.as_view(),       name='kommo-disconnect'),
     path('funnel/',     KommoFunnelView.as_view(),           name='kommo-funnel'),
+    path('leads/',      KommoLeadsListView.as_view(),        name='kommo-leads'),
 ]

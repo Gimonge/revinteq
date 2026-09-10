@@ -66,6 +66,59 @@ class KommoFunnelView(APIView):
         })
 
 
+class KommoLeadsListView(APIView):
+    """
+    GET /api/v1/kommo/leads/?page=1&limit=50
+    Raw list of every lead in the tenant's Kommo account, with their
+    current stage name — independent of ad-click matching, so it's
+    useful even before Meta is connected.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tenant = get_tenant(request)
+        if not tenant:
+            return Response({'connected': False, 'results': []})
+
+        try:
+            conn = tenant.kommo_connection
+        except KommoConnection.DoesNotExist:
+            return Response({'connected': False, 'results': []})
+
+        from .services.matching import refresh_pipeline_cache, _stage_name
+        from .services.kommo_api import KommoAPIClient, KommoAPIError
+
+        refresh_pipeline_cache(conn)
+        client = KommoAPIClient.for_connection(conn)
+
+        page  = int(request.query_params.get('page', 1))
+        limit = min(int(request.query_params.get('limit', 50)), 250)
+
+        try:
+            leads = client.get_leads(page=page, limit=limit)
+        except KommoAPIError as e:
+            return Response({'connected': True, 'error': str(e), 'results': []}, status=502)
+
+        results = []
+        for lead in leads:
+            contacts = lead.get('_embedded', {}).get('contacts', [])
+            contact_name = contacts[0].get('name') if contacts else ''
+            results.append({
+                'id':            lead.get('id'),
+                'name':          contact_name or lead.get('name') or f"Lead #{lead.get('id')}",
+                'price':         lead.get('price') or 0,
+                'stage_name':    _stage_name(conn, lead.get('status_id')),
+                'created_at':    lead.get('created_at'),
+                'updated_at':    lead.get('updated_at'),
+            })
+
+        return Response({
+            'connected': True,
+            'page':      page,
+            'results':   results,
+        })
+
+
 class KommoConnectManualView(APIView):
     """
     POST /api/v1/kommo/connect/

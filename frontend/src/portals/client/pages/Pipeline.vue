@@ -18,6 +18,27 @@
       <div class="rv-aov-cell"><div class="rv-aov-label">Closed Lost</div><div class="rv-aov-value" style="color:var(--red)">{{ summary.closedLost }}</div></div>
     </div>
 
+    <!-- All Kommo Leads (raw, not tied to an ad click) -->
+    <div v-if="kommoLeads.connected" class="rv-card card-reveal" style="animation-delay:.2s">
+      <div class="rv-ch"><span class="rv-ct">All Kommo Leads</span></div>
+      <div v-if="kommoLeads.results.length===0" class="rv-empty">
+        <div style="font-weight:800;margin-top:8px">No leads in Kommo yet</div>
+      </div>
+      <div v-else class="rv-tw">
+        <table class="rv-table">
+          <thead><tr><th>Lead</th><th>Stage</th><th>Value</th><th>Updated</th></tr></thead>
+          <tbody>
+            <tr v-for="lead in kommoLeads.results" :key="lead.id">
+              <td><strong>{{ lead.name }}</strong></td>
+              <td><span class="rv-badge" :class="isClosedWon(lead.stage_name)?'rv-bg':isClosedLost(lead.stage_name)?'rv-br':'rv-bgy'">{{ lead.stage_name }}</span></td>
+              <td>{{ lead.price ? fmtMoney(lead.price) : '—' }}</td>
+              <td style="white-space:nowrap">{{ lead.updated_at ? timeAgo(new Date(lead.updated_at*1000)) : '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Deal list -->
     <div class="rv-card card-reveal" style="animation-delay:.15s">
       <div v-if="loading" style="padding:40px;text-align:center"><span class="rv-spin"></span></div>
@@ -60,13 +81,17 @@
 import { ref, computed, onMounted } from 'vue'
 import api from '@/api'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
+import { useFormat } from '@/composables/useFormat'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 
+const { fmtMoney } = useFormat()
+
 defineEmits(['nav','toast'])
 const deals  = ref([])
 const funnel = ref({ connected:false, stages:[] })
+const kommoLeads = ref({ connected:false, results:[] })
 const loading = ref(true)
 const platformFilter = ref('')
 
@@ -94,11 +119,14 @@ function velClass(v) { return v==='hot'?'vel-hot':v==='warm'?'vel-warm':'vel-col
 function velIcon(v)  { return v==='hot'?'ti-flame':v==='warm'?'ti-circle-filled':'ti-snowflake' }
 function velColor(v) { return v==='warm'?'#d97706':v==='hot'?'#dc2626':'#2563eb' }
 function timeAgo(dt) { return dt ? dayjs(dt).fromNow() : '' }
+function isClosedWon(name)  { return /won/i.test(name || '') }
+function isClosedLost(name) { return /lost/i.test(name || '') }
 
 async function loadDeals() {
   loading.value = true
   try { const r = await api.get('/pipeline/deals/'); deals.value = r.data.results || r.data || [] } catch(e) {}
   try { const r = await api.get('/kommo/funnel/'); funnel.value = r.data } catch(e) {}
+  try { const r = await api.get('/kommo/leads/?limit=100'); kommoLeads.value = r.data } catch(e) {}
   loading.value = false
 }
 
