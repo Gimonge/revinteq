@@ -56,8 +56,21 @@ def sync_matched_leads_for_tenant(tenant_id: str):
 
 
 @shared_task
+def sync_unmatched_won_leads_for_tenant(tenant_id: str):
+    """Catch Won Kommo leads with no matched ad click at all (e.g. Meta not connected)."""
+    from .models import KommoConnection
+    from .services.matching import sync_unmatched_won_leads
+
+    try:
+        connection = KommoConnection.objects.get(tenant_id=tenant_id)
+    except KommoConnection.DoesNotExist:
+        return {'error': 'not connected'}
+    return sync_unmatched_won_leads(connection)
+
+
+@shared_task
 def sync_all_kommo_connections():
-    """Nightly — refresh pipeline structure, funnel counts, and check all tenants' matched leads for stage changes."""
+    """Nightly — refresh pipeline structure, funnel counts, and check all tenants' leads for stage changes."""
     from .models import KommoConnection
     from .services.matching import refresh_pipeline_cache, refresh_funnel_counts
     connections = KommoConnection.objects.filter(sync_enabled=True)
@@ -68,28 +81,7 @@ def sync_all_kommo_connections():
         except Exception as e:
             logger.warning(f"Kommo cache refresh failed for {conn.tenant.name}: {e}")
         sync_matched_leads_for_tenant.delay(str(conn.tenant_id))
+        sync_unmatched_won_leads_for_tenant.delay(str(conn.tenant_id))
         conn.last_synced = timezone.now()
         conn.save(update_fields=['last_synced'])
     return {'dispatched': connections.count()}
-
-
-@shared_task
-def refresh_expiring_kommo_tokens():
-    """Every few hours — proactively refresh tokens nearing their 24h expiry."""
-    from datetime import timedelta
-    from .models import KommoConnection
-    from .services.matching import refresh_connection_token
-
-    threshold = timezone.now() + timedelta(hours=2)
-    expiring = KommoConnection.objects.filter(
-        sync_enabled=True,
-        token_expires_at__lte=threshold,
-    )
-    refreshed = 0
-    for conn in expiring:
-        try:
-            refresh_connection_token(conn)
-            refreshed += 1
-        except Exception as e:
-            logger.warning(f"Kommo token refresh failed for {conn.tenant.name}: {e}")
-    return {'checked': expiring.count(), 'refreshed': refreshed}

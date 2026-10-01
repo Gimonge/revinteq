@@ -9,6 +9,10 @@ its own Meta channel connection, Revinteq via the existing referral
 webhooks). Revinteq then looks up the matching Kommo lead so that a
 later "won" deal there can be attributed back to the ad/campaign that
 produced it.
+
+Not every Won deal has a matched ad click, though (e.g. Meta isn't
+connected yet, or the lead came in organically) — those still become
+Sales, just without ad/campaign attribution. See sync_unmatched_won_leads.
 """
 from django.db import models
 from apps.common.encryption import encrypt
@@ -91,6 +95,11 @@ class KommoMatchedLead(models.Model):
     Kommo lead that Kommo independently created for the same click, so
     that a later "won" status on the Kommo side can be attributed back
     to the originating ad/campaign.
+
+    pipeline_deal is nullable: a Won Kommo lead with no matched ad click
+    (e.g. Meta isn't connected, or the lead came in organically) still
+    gets a row here once synced — just with pipeline_deal=None and no
+    ad/campaign attribution on its Sale.
     """
     STATUS_CHOICES = [
         ('pending',   'Pending match'),     # created, still searching for the Kommo lead
@@ -102,13 +111,14 @@ class KommoMatchedLead(models.Model):
     MATCH_METHOD_CHOICES = [
         ('phone', 'Phone number (WhatsApp)'),
         ('time_window', 'Nearest in time (Messenger/Instagram)'),
+        ('none', 'No ad-click match — synced from Kommo directly'),
     ]
 
     id     = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='kommo_matched_leads')
 
     pipeline_deal = models.OneToOneField(
-        'pipeline.PipelineDeal', on_delete=models.CASCADE, related_name='kommo_match'
+        'pipeline.PipelineDeal', on_delete=models.CASCADE, null=True, blank=True, related_name='kommo_match'
     )
 
     kommo_lead_id = models.CharField(max_length=100, blank=True, default='', db_index=True)

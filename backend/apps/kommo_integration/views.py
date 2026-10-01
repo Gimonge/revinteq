@@ -168,9 +168,10 @@ class KommoConnectManualView(APIView):
         logger.info(f"Kommo connected for {tenant.name} ({subdomain})")
 
         try:
-            from .services.matching import refresh_pipeline_cache, refresh_funnel_counts
+            from .services.matching import refresh_pipeline_cache, refresh_funnel_counts, sync_unmatched_won_leads
             refresh_pipeline_cache(connection, force=True)
             refresh_funnel_counts(connection, force=True)
+            sync_unmatched_won_leads(connection)
         except Exception as e:
             logger.warning(f"Could not fetch Kommo pipeline structure for {tenant.name}: {e}")
 
@@ -221,8 +222,9 @@ class KommoSyncView(APIView):
         except Exception as e:
             logger.warning(f"Pipeline cache refresh failed for {tenant.name}: {e}")
 
-        from .tasks import sync_matched_leads_for_tenant
+        from .tasks import sync_matched_leads_for_tenant, sync_unmatched_won_leads_for_tenant
         sync_matched_leads_for_tenant.delay(str(tenant.id))
+        sync_unmatched_won_leads_for_tenant.delay(str(tenant.id))
         return Response({'message': 'Sync started.'})
 
 

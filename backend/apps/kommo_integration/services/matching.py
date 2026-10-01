@@ -12,6 +12,11 @@ This service finds the Kommo lead that corresponds to a given PipelineDeal:
 KOMMO_MATCH_WINDOW_MINUTES controls how far after the click we'll still
 consider a Kommo lead a match. Retries give Kommo's own webhook time to
 create the lead first.
+
+sync_unmatched_won_leads handles the other case: a Won Kommo lead with no
+matched ad click at all (e.g. Meta isn't connected yet, or it came in
+organically) — those still become Sales, just without ad/campaign
+attribution.
 """
 import logging
 from datetime import timedelta
@@ -150,7 +155,35 @@ def attempt_match(matched_lead) -> bool:
         candidate = _closest_by_time(candidates, deal.new_click_at)
 
     if candidate:
-        matched_lead.kommo_lead_id = str(candidate['id'])
+        lead_id = str(candidate['id'])
+
+        # Edge case: the organic sync may have already claimed this exact
+        # Kommo lead (e.g. it was Won before the ad-click match finished).
+        # Reassign that record to this deal instead of creating a second,
+        # duplicate match for the same lead — avoids double-counting the Sale.
+        from .models import KommoMatchedLead
+        existing = KommoMatchedLead.objects.filter(
+            tenant=tenant, kommo_lead_id=lead_id
+        ).exclude(id=matched_lead.id).first()
+        if existing:
+            existing.pipeline_deal = deal
+            existing.save(update_fields=['pipeline_deal'])
+            # If it already synced as an unattributed Sale, backfill the
+            # ad/campaign attribution now that we know which click caused it.
+            if existing.sale_id:
+                existing.sale.pipeline_deal = deal
+                existing.sale.ad = deal.ad
+                existing.sale.campaign = deal.campaign
+                if deal.platform in ('facebook', 'instagram'):
+                    existing.sale.platform_source = deal.platform
+                existing.sale.customer_name = existing.sale.customer_name or deal.customer_name
+                existing.sale.customer_phone = existing.sale.customer_phone or deal.customer_phone
+                existing.sale.save()
+            matched_lead.delete()
+            logger.info(f"Kommo lead {lead_id} was already organically synced — reassigned to ad-matched deal {deal.id}")
+            return True
+
+        matched_lead.kommo_lead_id = lead_id
         matched_lead.match_method  = method
         matched_lead.status        = 'matched'
         matched_lead.matched_at    = timezone.now()
@@ -177,6 +210,45 @@ def _leads_within_window(leads: list, reference_time, minutes: int) -> list:
     return [l for l in leads if abs(l.get('created_at', 0) - reference_ts) <= window]
 
 
+def _create_sale_from_lead(tenant, lead, connection, deal=None) -> 'Sale':
+    """Shared Sale-creation logic for both the ad-matched and unmatched paths."""
+    from apps.sales.models import Sale
+
+    amount = lead.get('price') or 0
+    closed_at = lead.get('closed_at')
+    sale_date = timezone.datetime.fromtimestamp(closed_at).date() if closed_at else timezone.now().date()
+
+    if deal:
+        platform_source = deal.platform if deal.platform in ('facebook', 'instagram') else 'other'
+        customer_name  = deal.customer_name
+        customer_phone = deal.customer_phone
+        notes = f"Synced from Kommo lead #{lead.get('id')} (Won, ad-matched)"
+        ad, campaign, pipeline_deal = deal.ad, deal.campaign, deal
+    else:
+        platform_source = 'organic'
+        contacts = lead.get('_embedded', {}).get('contacts', [])
+        customer_name  = contacts[0].get('name') if contacts else ''
+        customer_phone = ''
+        notes = f"Synced from Kommo lead #{lead.get('id')} (Won, no ad-click match)"
+        ad, campaign, pipeline_deal = None, None, None
+
+    return Sale.objects.create(
+        tenant          = tenant,
+        pipeline_deal   = pipeline_deal,
+        ad              = ad,
+        campaign        = campaign,
+        customer_name   = customer_name,
+        customer_phone  = customer_phone,
+        product_name    = lead.get('name') or 'Kommo deal',
+        amount          = amount,
+        payment_method  = 'other',
+        platform_source = platform_source,
+        sale_date       = sale_date,
+        is_confirmed    = True,
+        notes           = notes,
+    )
+
+
 def sync_lead_status(matched_lead) -> bool:
     """
     For an already-matched lead, refresh its current Kommo stage
@@ -184,8 +256,6 @@ def sync_lead_status(matched_lead) -> bool:
     HOT"). If the stage is Won, also create the Sale. Returns True if a
     Sale was created this call.
     """
-    from apps.sales.models import Sale
-
     tenant = matched_lead.tenant
     connection = tenant.kommo_connection
     refresh_pipeline_cache(connection)
@@ -213,34 +283,78 @@ def sync_lead_status(matched_lead) -> bool:
         matched_lead.save()
         return False  # already synced
 
-    deal   = matched_lead.pipeline_deal
-    amount = lead.get('price') or 0
-    closed_at = lead.get('closed_at')
-    sale_date = timezone.datetime.fromtimestamp(closed_at).date() if closed_at else timezone.now().date()
-
-    platform_source = deal.platform if deal.platform in ('facebook', 'instagram') else 'other'
-
-    sale = Sale.objects.create(
-        tenant          = tenant,
-        pipeline_deal   = deal,
-        ad              = deal.ad,
-        campaign        = deal.campaign,
-        customer_name   = deal.customer_name,
-        customer_phone  = deal.customer_phone,
-        product_name    = lead.get('name') or 'Kommo deal',
-        amount          = amount,
-        payment_method  = 'other',
-        platform_source = platform_source,
-        sale_date       = sale_date,
-        is_confirmed    = True,
-        notes           = f"Synced from Kommo lead #{matched_lead.kommo_lead_id} (Won)",
-    )
+    sale = _create_sale_from_lead(tenant, lead, connection, deal=matched_lead.pipeline_deal)
 
     matched_lead.sale       = sale
     matched_lead.status     = 'won'
-    matched_lead.won_amount = amount
+    matched_lead.won_amount = sale.amount
     matched_lead.won_at     = timezone.now()
     matched_lead.save()
 
     logger.info(f"Kommo won-deal synced as Sale {sale.id} for tenant {tenant.name}")
     return True
+
+
+def sync_unmatched_won_leads(connection) -> dict:
+    """
+    Catch any Won Kommo lead that never went through the ad-click matching
+    flow at all (no PipelineDeal exists for it — e.g. Meta isn't connected
+    yet, or the lead came in organically). Creates a Sale for each one
+    found, with no ad/campaign attribution, and a KommoMatchedLead row
+    (pipeline_deal=None) so it's never double-processed.
+    """
+    tenant = connection.tenant
+    refresh_pipeline_cache(connection)
+    client = KommoAPIClient.for_connection(connection)
+
+    existing_ids = set(
+        connection.tenant.kommo_matched_leads.exclude(kommo_lead_id='').values_list('kommo_lead_id', flat=True)
+    )
+
+    created = 0
+    checked = 0
+    page = 1
+    while True:
+        leads = client.get_leads(page=page, limit=250)
+        if not leads:
+            break
+        for lead in leads:
+            if lead.get('status_id') != WON_STATUS_ID:
+                continue
+            checked += 1
+            lead_id = str(lead['id'])
+            if lead_id in existing_ids:
+                continue  # already handled, either ad-matched or a previous organic sync
+
+            try:
+                sale = _create_sale_from_lead(tenant, lead, connection, deal=None)
+                from .models import KommoMatchedLead
+                KommoMatchedLead.objects.create(
+                    tenant=tenant,
+                    pipeline_deal=None,
+                    kommo_lead_id=lead_id,
+                    status='won',
+                    match_method='none',
+                    kommo_status_id=lead.get('status_id'),
+                    kommo_status_name=_stage_name(connection, lead.get('status_id')),
+                    kommo_pipeline_id=str(lead.get('pipeline_id', '')),
+                    sale=sale,
+                    won_amount=sale.amount,
+                    won_at=timezone.now(),
+                    raw_lead_data=lead,
+                    matched_at=timezone.now(),
+                    last_checked=timezone.now(),
+                )
+                existing_ids.add(lead_id)
+                created += 1
+                logger.info(f"Kommo organic won-lead synced as Sale {sale.id} for tenant {tenant.name}")
+            except Exception as e:
+                logger.warning(f"Failed to sync unmatched won lead {lead_id} for {tenant.name}: {e}")
+
+        if len(leads) < 250:
+            break
+        page += 1
+        if page > 40:
+            break
+
+    return {'checked_won': checked, 'created': created}
