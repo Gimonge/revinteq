@@ -227,7 +227,7 @@ def _create_sale_from_lead(tenant, lead, connection, deal=None) -> 'Sale':
     else:
         platform_source = 'organic'
         contacts = lead.get('_embedded', {}).get('contacts', [])
-        customer_name  = contacts[0].get('name') if contacts else ''
+        customer_name  = (contacts[0].get('name') or '') if contacts else ''
         customer_phone = ''
         notes = f"Synced from Kommo lead #{lead.get('id')} (Won, no ad-click match)"
         ad, campaign, pipeline_deal = None, None, None
